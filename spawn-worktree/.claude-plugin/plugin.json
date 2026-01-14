@@ -1,0 +1,15 @@
+{
+  "name": "spawn-worktree",
+  "version": "1.0.0",
+  "description": "Spawns a new git worktree with a fresh Claude session. Use /spawn <task-name> to create an isolated workspace for a feature.",
+  "author": {
+    "name": "mohamedh"
+  },
+  "license": "MIT",
+  "keywords": [
+    "worktree",
+    "git",
+    "spawn",
+    "workflow"
+  ]
+}

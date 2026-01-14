@@ -1,0 +1,9 @@
+{
+  "name": "prd",
+  "version": "1.0.0",
+  "description": "Create comprehensive Product Requirements Documents with stories and tasks",
+  "author": {
+    "name": "mohamedh"
+  },
+  "license": "MIT"
+}

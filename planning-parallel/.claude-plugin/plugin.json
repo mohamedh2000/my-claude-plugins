@@ -1,0 +1,15 @@
+{
+  "name": "planning-parallel",
+  "version": "1.0.0",
+  "description": "Fork of planning-with-files with parallel sub-agent execution support.",
+  "author": {
+    "name": "mohamedh"
+  },
+  "license": "MIT",
+  "keywords": [
+    "planning",
+    "memory",
+    "parallel",
+    "agents"
+  ]
+}

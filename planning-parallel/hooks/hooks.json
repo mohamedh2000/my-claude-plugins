@@ -1,0 +1,47 @@
+{
+  "description": "Planning-parallel plugin hooks for task tracking and completion verification",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '[planning-parallel] Ready. Supports parallel sub-agent execution for tasks from /prd'"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|Bash|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat task_plan.md 2>/dev/null | head -50 || true"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '[planning-parallel] File updated. Check if task complete, update task_plan.md status.'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-complete.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

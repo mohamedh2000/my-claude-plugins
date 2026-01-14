@@ -1,0 +1,25 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "mohamedh-plugins",
+  "description": "Personal Claude Code plugins",
+  "owner": {
+    "name": "mohamedh"
+  },
+  "plugins": [
+    {
+      "name": "spawn-worktree",
+      "description": "Spawns a new git worktree with a fresh Claude session running /prd",
+      "source": "./spawn-worktree"
+    },
+    {
+      "name": "planning-parallel",
+      "description": "File-based planning with parallel sub-agent execution",
+      "source": "./planning-parallel"
+    },
+    {
+      "name": "prd",
+      "description": "Create comprehensive Product Requirements Documents with stories and tasks",
+      "source": "./prd"
+    }
+  ]
+}

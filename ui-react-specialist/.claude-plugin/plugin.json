@@ -1,0 +1,9 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "ui-react-specialist",
+  "description": "React UI specialist for building components, design systems, and accessible interfaces",
+  "version": "1.0.0",
+  "author": {
+    "name": "mohamedh"
+  }
+}

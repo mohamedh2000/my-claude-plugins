@@ -20,6 +20,16 @@
       "name": "prd",
       "description": "Create comprehensive Product Requirements Documents with stories and tasks",
       "source": "./prd"
+    },
+    {
+      "name": "senior-backend-engineer",
+      "description": "Backend development specialist for APIs, databases, authentication, and server-side logic",
+      "source": "./senior-backend-engineer"
+    },
+    {
+      "name": "ui-react-specialist",
+      "description": "React UI specialist for building components, design systems, and accessible interfaces",
+      "source": "./ui-react-specialist"
     }
   ]
 }

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "senior-backend-engineer",
+  "description": "Backend development specialist for APIs, databases, authentication, and server-side logic",
+  "version": "1.0.0",
+  "author": {
+    "name": "mohamedh"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "agent-browser",
+  "version": "1.0.0",
+  "description": "Headless browser automation for web testing, form filling, screenshots, and data extraction",
+  "author": {
+    "name": "mohamedh"
+  },
+  "license": "MIT"
+}

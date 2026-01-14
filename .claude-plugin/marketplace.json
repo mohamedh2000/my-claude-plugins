@@ -30,6 +30,11 @@
       "name": "ui-react-specialist",
       "description": "React UI specialist for building components, design systems, and accessible interfaces",
       "source": "./ui-react-specialist"
+    },
+    {
+      "name": "agent-browser",
+      "description": "Headless browser automation for web testing, form filling, screenshots, and data extraction",
+      "source": "./agent-browser"
     }
   ]
 }

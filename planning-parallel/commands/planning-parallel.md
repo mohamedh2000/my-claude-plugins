@@ -56,31 +56,45 @@ ISOLATED FILES (each sub-agent WRITES to their own):
 
 **1. DETECT** - Read task_plan.md, find the current Execution Group
 
-**2. SPAWN** - For each task in the parallel group:
+**2. SPAWN IN BACKGROUND** - For each task in the parallel group:
 - Use Task tool with appropriate agent type
+- **CRITICAL**: Set `run_in_background: true` for ALL parallel agents
 - ALL tasks in group spawn in a SINGLE message (true parallel)
 - Each agent gets their isolated file names
+- Store the returned `output_file` paths and `task_id` for each agent
 
-**3. EXECUTE** - Each sub-agent:
+**3. MONITOR & UPDATE** - While agents execute in background:
+- Use `TaskOutput` tool with `block: false` to check status without blocking
+- Alternatively, use `Read` tool on the `output_file` paths
+- **Provide progress updates to the user** as agents complete:
+  - "✓ [TASK-ID] complete - [brief summary]"
+  - "⏳ [TASK-ID] still in progress..."
+- Continue checking periodically until all agents in the group finish
+
+**4. EXECUTE** - Each sub-agent (running in background):
 - READS: task_plan.md, findings.md, progress.md, PRD
 - WRITES: findings_[TASK-ID].md, progress_[TASK-ID].md
 - DOES NOT MODIFY: shared files
 
-**4. MERGE** - After ALL agents complete:
+**5. MERGE** - After ALL agents in group complete:
 - Read all findings_[TASK-ID].md from the group
 - Append to findings.md under `## [TASK-ID] Findings`
 - Read all progress_[TASK-ID].md from the group
 - Append to progress.md
 - Update task_plan.md statuses
 - Delete sub-agent files (cleanup)
+- **Report to user**: "Group [N] complete. Moving to Group [N+1]..."
 
-**5. CONTINUE** - Proceed to next group
+**6. CONTINUE** - Proceed to next group
 
 ### Sub-Agent Prompt Template
 
-For EACH parallel task, spawn with:
+For EACH parallel task, spawn with `run_in_background: true`:
 
 ```
+run_in_background: true
+Agent type: [from task_plan.md - senior-backend-engineer | ui-react-specialist | general-purpose]
+
 You are executing [TASK-ID]: [Task Title] for [feature-name].
 
 CONTEXT (read first, DO NOT modify):
@@ -98,6 +112,31 @@ Complete all subtasks for [TASK-ID] listed in task_plan.md.
 
 WHEN COMPLETE:
 Return summary: files created/modified, status (complete/blocked), any blockers.
+```
+
+### Orchestrator Monitoring Loop
+
+While background agents are running, the orchestrator should:
+
+```
+1. SPAWN all group tasks with run_in_background: true
+   → Store task_id and output_file for each
+
+2. MONITOR LOOP (repeat until all complete):
+   a. For each running agent:
+      - Use TaskOutput with block: false, timeout: 5000
+      - OR Read the output_file to check progress
+
+   b. Report status updates to user:
+      - "⏳ Running: BE-001, FE-001, INFRA-001..."
+      - "✓ BE-001 complete: Created user model and migrations"
+      - "✓ FE-001 complete: Built UserProfile component"
+      - "⏳ Still waiting on: INFRA-001..."
+
+   c. If all complete, exit loop
+
+3. MERGE results from all agents
+4. CONTINUE to next group
 ```
 
 ### Post-Group Merge Checklist

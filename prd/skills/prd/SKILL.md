@@ -459,15 +459,23 @@ Critical Path: BE-001 → BE-002 → FE-003 → FE-004
 
 ## Phase 4: Review - Multi-Agent Critique
 
-After the PRD is written, spawn two specialized review agents to analyze the document:
+After the PRD is written, spawn two specialized review agents to analyze the document.
 
 ### Spawn Review Agents
 
-Use the Task tool to spawn both agents in parallel:
+Use the Task tool to spawn both agents **in the background** (set `run_in_background: true`). This allows you to continue monitoring progress and provide updates to the user as reviews complete.
+
+**IMPORTANT**: When spawning review agents:
+1. Set `run_in_background: true` on BOTH Task tool calls
+2. Spawn both agents in a SINGLE message (parallel execution)
+3. Store the returned `output_file` paths for each agent
+4. Periodically check progress using `Read` tool on the output files
+5. Report to the user as each review completes
 
 **Agent 1: Project Manager Reviewer**
 ```
 Subagent type: general-purpose
+run_in_background: true
 Prompt: You are a Senior Project Manager reviewing a PRD. Read the document at .claude/Task Documents/PRD-[feature-name].md and provide a critical analysis:
 
 1. **Completeness Check**:
@@ -496,6 +504,7 @@ Provide your analysis in a structured format.
 **Agent 2: Senior Software Engineer Reviewer**
 ```
 Subagent type: general-purpose
+run_in_background: true
 Prompt: You are a Senior Software Engineer reviewing a PRD for technical feasibility. Read the document at .claude/Task Documents/PRD-[feature-name].md and provide technical critique:
 
 1. **Technical Feasibility**:
@@ -526,9 +535,16 @@ Prompt: You are a Senior Software Engineer reviewing a PRD for technical feasibi
 Provide your analysis in a structured format.
 ```
 
-### Collect Reviews
+### Monitor Background Agents and Collect Reviews
 
-Wait for both agents to complete their reviews. Compile their feedback.
+After spawning both review agents in the background:
+
+1. **Monitor Progress**: Use `Read` tool on the `output_file` paths returned by each Task call
+2. **Provide Updates**: As each agent completes, inform the user:
+   - "✓ PM Review complete - analyzing feedback..."
+   - "✓ Engineering Review complete - analyzing feedback..."
+3. **Use TaskOutput**: You can also use `TaskOutput` tool with `block: false` to check status without waiting
+4. **Compile Feedback**: Once both agents finish, compile their feedback for the refinement phase
 
 ---
 

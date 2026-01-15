@@ -69,19 +69,48 @@ if [ -f "${HOME}/.claude/settings.json" ]; then
   fi
 fi
 
-# Use AppleScript to open a new terminal in current Antigravity window,
-# navigate to worktree, and start Claude with planning-with-files
+# Detect which terminal application we're running inside of
 ESCAPED_PATH=$(printf '%s' "$WORKTREE_PATH" | sed "s/'/'\\\\''/g")
 
-osascript <<EOF
--- Activate Antigravity to ensure it's focused
+# TERM_PROGRAM tells us which terminal emulator is running the script
+# iTerm2 = "iTerm.app", Terminal = "Apple_Terminal", Antigravity/VS Code = "vscode"
+TERMINAL_APP="${TERM_PROGRAM:-}"
+
+echo ""
+
+if [[ "$TERMINAL_APP" == "iTerm.app" ]]; then
+  # Use Cmd+D to split pane in iTerm2
+  osascript <<EOF
+tell application "iTerm2" to activate
+delay 0.3
+
+tell application "System Events"
+  tell process "iTerm2"
+    -- Split pane (Cmd+D)
+    key code 2 using {command down}
+    delay 0.5
+
+    -- Navigate to worktree and start Claude
+    keystroke "cd '${ESCAPED_PATH}' && claude '/prd'"
+    delay 0.2
+
+    -- Press Enter to execute
+    key code 36
+  end tell
+end tell
+EOF
+  echo "✓ Opened new split pane in iTerm2"
+
+elif [[ "$TERMINAL_APP" == "vscode" ]]; then
+  # Use System Events for Antigravity/VS Code (Cmd+\ to split)
+  osascript <<EOF
 tell application "Antigravity" to activate
-delay 0.5
+delay 0.3
 
 tell application "System Events"
   tell process "Antigravity"
-    -- Open new terminal panel (Ctrl+\`)
-    keystroke "\`" using {control down}
+    -- Open new terminal panel (Cmd+\)
+    key code 42 using {command down}
     delay 0.5
 
     -- Navigate to worktree and start Claude with planning-with-files
@@ -93,9 +122,51 @@ tell application "System Events"
   end tell
 end tell
 EOF
+  echo "✓ Opened new split pane in Antigravity"
 
-echo ""
-echo "✓ Opened new terminal in Antigravity"
+elif [[ "$TERMINAL_APP" == "Apple_Terminal" ]]; then
+  # Use macOS Terminal
+  osascript <<EOF
+tell application "Terminal"
+  activate
+  do script "cd '${ESCAPED_PATH}' && claude '/prd'"
+end tell
+EOF
+  echo "✓ Opened new window in Terminal"
+
+else
+  # Fallback: try iTerm2 if available, otherwise Terminal
+  if osascript -e 'application "iTerm2" is running' 2>/dev/null | grep -q true; then
+    osascript <<EOF
+tell application "iTerm2" to activate
+delay 0.3
+
+tell application "System Events"
+  tell process "iTerm2"
+    -- Split pane (Cmd+D)
+    key code 2 using {command down}
+    delay 0.5
+
+    -- Navigate to worktree and start Claude
+    keystroke "cd '${ESCAPED_PATH}' && claude '/prd'"
+    delay 0.2
+
+    -- Press Enter to execute
+    key code 36
+  end tell
+end tell
+EOF
+    echo "✓ Opened new split pane in iTerm2 (fallback)"
+  else
+    osascript <<EOF
+tell application "Terminal"
+  activate
+  do script "cd '${ESCAPED_PATH}' && claude '/prd'"
+end tell
+EOF
+    echo "✓ Opened new window in Terminal (fallback)"
+  fi
+fi
 echo "✓ Navigating to: $WORKTREE_PATH"
 echo "✓ Starting Claude with /prd"
 echo ""

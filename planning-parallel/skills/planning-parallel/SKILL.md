@@ -217,6 +217,48 @@ Use templates from `${CLAUDE_PLUGIN_ROOT}/templates/`:
 
 ---
 
+## Final Code Simplification Pass
+
+After ALL tasks are validated complete (final group done), spawn **5 parallel code-simplifier agents** to review and simplify all files created/modified during execution.
+
+### Code Simplification Protocol
+
+**1. COLLECT** - Gather list of all files created/modified:
+- Read progress.md to identify all files touched
+- Read each progress_[TASK-ID].md section for "Files Created/Modified"
+- Deduplicate the file list
+
+**2. PARTITION** - Split files into 5 roughly equal batches
+
+**3. SPAWN** - Launch 5 parallel `code-simplifier:code-simplifier` agents:
+
+```
+You are a code simplifier reviewing files from the [feature-name] implementation.
+
+FILES TO REVIEW (batch N of 5):
+- [file1.js]
+- [file2.js]
+- ...
+
+TASK:
+1. Read each file
+2. Simplify and refine code for clarity, consistency, and maintainability
+3. Preserve all functionality - DO NOT change behavior
+4. Focus on: removing duplication, improving naming, simplifying logic
+5. Return summary of changes made
+
+Do NOT create new files. Only edit existing files from your batch.
+```
+
+**4. MERGE** - After all 5 agents complete:
+- Collect any findings into findings.md
+- Log simplification summary to progress.md
+- Run tests to verify no regressions: `npm test`
+
+**5. DONE** - Report final status to user
+
+---
+
 ## Integration with /prd
 
 This skill is designed to work with `/prd`:
@@ -226,6 +268,7 @@ This skill is designed to work with `/prd`:
 3. `/planning-parallel` executes the plan
 4. Parallel groups spawn sub-agents
 5. Sequential tasks execute directly
+6. **Final pass: 5 parallel code-simplifier agents clean up all changes**
 
 ```
 /spawn feature-name
@@ -237,5 +280,6 @@ This skill is designed to work with `/prd`:
     ├── Merge results
     ├── Group 2: Spawn dependent tasks
     ├── Merge results
-    └── Sequential: Testing, Delivery
+    ├── Sequential: Testing, Delivery
+    └── Final: 5x code-simplifier agents (parallel)
 ```

@@ -33,7 +33,7 @@ When you run `/spawn <task-name>`:
 Execute these steps:
 
 1. Extract the task name from the arguments
-2. Run the spawn script: `~/.claude/plugins/local/spawn-worktree/scripts/spawn.sh "<task-name>"`
+2. Run the spawn script: `${CLAUDE_PLUGIN_ROOT}/scripts/spawn.sh "<task-name>"`
 3. Report the result to the user
 4. **STOP HERE** - Tell the user to switch to the new terminal window
 

@@ -114,6 +114,69 @@ WHEN COMPLETE:
 Return summary: files created/modified, status (complete/blocked), any blockers.
 ```
 
+### Sub-Agent Continuation Protocol (NO COMPACTION - Handoff Only)
+
+**CRITICAL: Sub-agents must NEVER compact their context.** If approaching context limits, they must checkpoint their progress and request a NEW agent to continue. The orchestrator handles spawning the continuation agent.
+
+When a sub-agent approaches context limits:
+
+**1. CHECKPOINT** - Write progress to isolated files:
+```markdown
+## findings_[TASK-ID].md
+### Checkpoint at [timestamp]
+**Completed:**
+- [x] Subtask 1: Created UserModel.js
+- [x] Subtask 2: Added migrations
+
+**In Progress:**
+- [ ] Subtask 3: API endpoints (started, 2 of 5 done)
+
+**Key Decisions:**
+- Using UUID for user IDs because [reason]
+- Skipped soft-delete, using hard-delete because [reason]
+
+**Next Steps:**
+1. Complete remaining 3 endpoints in UserController
+2. Add input validation
+3. Write tests
+```
+
+```markdown
+## progress_[TASK-ID].md
+### Files Modified
+- src/models/UserModel.js (created)
+- src/migrations/001_users.js (created)
+- src/controllers/UserController.js (in progress - 2/5 endpoints)
+
+### Errors Encountered
+- None yet
+
+### Continuation Required
+Status: PARTIAL_COMPLETE
+Reason: Context compaction needed
+Resume from: Subtask 3, endpoint 3 of 5
+```
+
+**2. RETURN WITH CONTINUATION FLAG** - End with:
+```
+STATUS: PARTIAL_COMPLETE
+CONTINUATION_REQUIRED: true
+RESUME_FROM: "Subtask 3 - Create remaining 3 API endpoints"
+FILES_TO_READ: findings_[TASK-ID].md, progress_[TASK-ID].md
+```
+
+**3. ORCHESTRATOR DETECTS & RESPAWNS** - When orchestrator sees `CONTINUATION_REQUIRED`:
+```
+Spawn new agent with:
+- Same [TASK-ID]
+- Add to prompt: "CONTINUATION - Read findings_[TASK-ID].md and progress_[TASK-ID].md first. Previous agent completed subtasks 1-2. Resume from: [RESUME_FROM]"
+```
+
+**4. NEW AGENT READS CHECKPOINT** - Continuation agent:
+- Reads isolated files to understand completed work
+- Skips completed subtasks
+- Resumes from checkpoint
+
 ### Orchestrator Monitoring Loop
 
 While background agents are running, the orchestrator should:
@@ -191,6 +254,12 @@ During parallel execution, ONLY orchestrator writes to:
 - findings.md (via merge)
 - progress.md (via merge)
 
+### 6. No Compaction - Handoff Only
+Sub-agents must **NEVER** compact their context. When approaching limits:
+1. Checkpoint progress to isolated files
+2. Return with `CONTINUATION_REQUIRED: true`
+3. Orchestrator spawns fresh agent to continue
+
 ---
 
 ## The 3-Strike Error Protocol
@@ -257,9 +326,11 @@ After ALL tasks are validated complete (final group done), spawn **5 parallel co
 
 **2. PARTITION** - Split files into 5 roughly equal batches
 
-**3. SPAWN** - Launch 5 parallel `code-simplifier:code-simplifier` agents:
+**3. SPAWN** - Launch 5 parallel `code-simplifier:code-simplifier` agents with `run_in_background: true`:
 
 ```
+run_in_background: true
+
 You are a code simplifier reviewing files from the [feature-name] implementation.
 
 FILES TO REVIEW (batch N of 5):
@@ -282,6 +353,69 @@ Do NOT create new files. Only edit existing files from your batch.
 - Log simplification summary to progress.md
 - Run tests to verify no regressions: `npm test`
 
+**5. PROCEED** - Continue to Code Review Pass
+
+---
+
+## Final Code Review Pass
+
+After code simplification and tests pass, spawn **5 parallel code-reviewer agents** to analyze all changes and provide recommendations.
+
+### Code Review Protocol
+
+**1. PARTITION** - Use same file batches from simplification step
+
+**2. SPAWN** - Launch 5 parallel `feature-dev:code-reviewer` agents with `run_in_background: true`:
+
+```
+run_in_background: true
+
+You are reviewing code changes from the [feature-name] implementation.
+
+FILES TO REVIEW (batch N of 5):
+- [file1.js]
+- [file2.js]
+- ...
+
+REVIEW FOR:
+1. Bugs and logic errors
+2. Security vulnerabilities (OWASP top 10)
+3. Performance issues
+4. Code quality and maintainability
+5. Adherence to project conventions (check CLAUDE.md)
+
+OUTPUT FORMAT:
+For each issue found, report:
+- File and line number
+- Severity: CRITICAL / HIGH / MEDIUM / LOW
+- Description of issue
+- Recommended fix
+
+If no issues found, report "No issues found in batch N"
+```
+
+**3. COLLECT** - After all 5 agents complete:
+- Gather all issues from each agent
+- Filter by confidence (only report issues with ≥80% confidence)
+- Deduplicate similar issues
+
+**4. REPORT** - Present findings to user:
+```markdown
+## Code Review Summary
+
+### Critical Issues (must fix)
+- [file:line] - Description
+
+### High Priority
+- [file:line] - Description
+
+### Recommendations (optional)
+- [file:line] - Description
+
+### Files with No Issues
+- file1.js, file2.js, ...
+```
+
 **5. DONE** - Report final status to user
 
 ---
@@ -295,7 +429,8 @@ This skill is designed to work with `/prd`:
 3. `/planning-parallel` executes the plan
 4. Parallel groups spawn sub-agents
 5. Sequential tasks execute directly
-6. **Final pass: 5 parallel code-simplifier agents clean up all changes**
+6. **Simplification pass: 5 parallel code-simplifier agents clean up changes**
+7. **Review pass: 5 parallel code-reviewer agents analyze and report issues**
 
 ```
 /spawn feature-name
@@ -308,5 +443,7 @@ This skill is designed to work with `/prd`:
     ├── Group 2: Spawn dependent tasks
     ├── Merge results
     ├── Sequential: Testing, Delivery
-    └── Final: 5x code-simplifier agents (parallel)
+    ├── Simplify: 5x code-simplifier agents (parallel)
+    ├── Run tests (verify no regressions)
+    └── Review: 5x code-reviewer agents (parallel) → Report to user
 ```

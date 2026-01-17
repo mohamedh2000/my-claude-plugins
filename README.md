@@ -29,6 +29,27 @@ A collection of Claude Code plugins for professional software development workfl
    }
    ```
 
+## Deep Dive Documentation
+
+For detailed explanations of how these plugins work under the hood:
+
+| Document | Description |
+|----------|-------------|
+| **[Planning Parallel Architecture](docs/PLANNING_PARALLEL.md)** | Flow diagrams, error handling, sub-agent handoffs, token exhaustion recovery |
+| **[PRD Workflow](docs/PRD_WORKFLOW.md)** | The 6-phase workflow, task_plan.md optimization, mandatory integration |
+
+### Key Features
+
+- **Fault-Tolerant Execution** - 3-strike error protocol with automatic approach mutation
+- **Sub-Agent Handoffs** - Seamless checkpoint & continue when agents hit context limits
+- **Token Exhaustion Recovery** - Pick up exactly where you left off across sessions
+- **File-Based Memory** - Nothing important stays only in context; everything persists to disk
+- **Parallel Quality Passes** - 5x code simplifiers + 5x code reviewers run in parallel
+- **Codebase-Aware PRDs** - Discovery phase explores your codebase before asking questions
+- **Mandatory Integration** - Never ship disconnected frontend/backend again
+
+---
+
 ## Plugins Overview
 
 | Plugin | Type | Description |

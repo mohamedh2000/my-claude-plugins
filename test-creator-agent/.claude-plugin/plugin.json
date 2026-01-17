@@ -1,0 +1,8 @@
+{
+  "name": "test-creator-agent",
+  "description": "Automated test generation agent that analyzes repo test patterns, captures real data via browser automation, and generates comprehensive tests",
+  "version": "1.0.0",
+  "author": {
+    "name": "mohamedh"
+  }
+}

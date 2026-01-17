@@ -2,6 +2,8 @@
 
 A collection of Claude Code plugins for professional software development workflows. Features parallel agent execution, comprehensive PRD generation, and specialized development agents.
 
+> **Note:** The `/planning-parallel` plugin is built on top of the excellent [planning-with-files](https://github.com/OthmanAdi/planning-with-files) approach by [@OthmanAdi](https://github.com/OthmanAdi), extending it with parallel sub-agent execution, fault-tolerant error handling, and seamless token exhaustion recovery.
+
 ## Installation
 
 1. **Add the marketplace to Claude Code:**

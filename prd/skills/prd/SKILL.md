@@ -32,6 +32,70 @@ This skill follows a 6-phase approach:
 
 ---
 
+## Phase 0: Check for Existing PRD (Entry Point)
+
+Before starting the workflow, check if an existing PRD file was provided as an argument.
+
+### Argument Detection
+
+Check the provided arguments:
+- **If argument is a file path** (ends with `.md` or contains `/`):
+  - Read the file
+  - Parse the PRD content
+  - Jump to appropriate phase based on PRD status
+- **If argument is a description** (or empty):
+  - Proceed to Phase 1 (Exploration) as normal
+  - Use description as initial feature context if provided
+
+### Loading Existing PRD
+
+If a file path is provided:
+
+```
+1. Read the PRD file at the provided path
+2. Check the PRD Status field (Draft | In Review | Approved)
+3. Analyze what sections are complete vs incomplete
+```
+
+**Based on PRD Status:**
+
+| Status | Action |
+|--------|--------|
+| **Draft** | Continue from Discovery/Documentation phase. Ask clarifying questions for incomplete sections. |
+| **In Review** | Jump to Review Phase (spawn PM + Engineer reviewers) |
+| **Approved** | Jump to Handoff Phase (generate task_plan.md if not exists) |
+| **Incomplete/Missing sections** | Identify gaps, ask clarifying questions, fill in missing parts |
+
+### Resuming PRD Workflow
+
+When loading an existing PRD:
+
+1. **Summarize what exists**:
+   > "I've loaded the PRD for [Feature Name]. Here's what's defined:
+   > - ✓ Overview and goals
+   > - ✓ User stories (5 stories)
+   > - ⚠️ Technical requirements (incomplete - missing API contracts)
+   > - ✗ Tasks breakdown (not started)
+   >
+   > I have some questions to fill in the gaps..."
+
+2. **Ask clarifying questions** for incomplete sections
+
+3. **Continue workflow** from the appropriate phase
+
+### Example Usage
+
+```
+/prd .claude/Task Documents/PRD-notifications.md
+```
+
+Claude reads the file, analyzes completeness, and continues:
+> "I've loaded your PRD for the Notification System. The user stories look complete, but I noticed the API contracts section is empty. Let me ask a few questions:
+> 1. What format should notifications be returned in - paginated list or infinite scroll?
+> 2. Should read/unread status be tracked per-notification or per-user?"
+
+---
+
 ## Phase 1: Exploration - Codebase Understanding
 
 Before asking requirements questions, gain context about the existing project. This enables more informed questions and ensures the PRD aligns with current architecture.
@@ -284,13 +348,21 @@ Sprint/Phase 1: Foundation (Parallel Tracks)
 ├── Track B (Frontend):    [FE-001] → [FE-002]
 └── Track C (Infra):       [INFRA-001]
 
-Sprint/Phase 2: Integration (After Phase 1)
+Sprint/Phase 2: Additional Features (After Phase 1)
 ├── Track A (Backend):     [BE-003]
-└── Track B (Frontend):    [FE-003] (depends on BE-001, BE-002)
+└── Track B (Frontend):    [FE-003]
 
-Sprint/Phase 3: Polish (After Phase 2)
+Sprint/Phase 3: Integration (MANDATORY - After Phase 2)
+└── Track INT:             [FE-INT-001] → [FE-INT-002]
+    ├── Connect FE to BE endpoints
+    ├── Verify API contracts match
+    └── End-to-end verification
+
+Sprint/Phase 4: Polish (After Phase 3)
 └── All tracks converge:   [FE-004], [BE-004]
 ```
+
+> ⚠️ **Phase 3 (Integration) is MANDATORY** when the feature has both backend and frontend tasks. Never skip this phase.
 
 ---
 
@@ -342,13 +414,32 @@ Sprint/Phase 3: Polish (After Phase 2)
 - **Dependencies**: FE-001
 - **Complexity**: Small | Medium | Large
 
-#### Track FE-B: [Theme - e.g., Integration]
+#### Track FE-INT: Frontend-Backend Integration (REQUIRED)
+> ⚠️ **MANDATORY**: Always include this track when PRD has both BE and FE tasks
 
-**[FE-003] Task Title** → Requires BE-001, BE-002, FE-001
-- **Description**: What needs to be done
-- **Story**: C1
-- **Dependencies**: BE-001, BE-002, FE-001
-- **Complexity**: Small | Medium | Large
+**[FE-INT-001] Connect Frontend to Backend Endpoints** → Requires all BE-*, all FE-UI-*
+- **Description**: Wire frontend components to actual backend API endpoints, replacing any mock data with real API calls
+- **Story**: Integration
+- **Dependencies**: All BE tasks, All FE UI tasks
+- **Complexity**: Medium
+- **Subtasks**:
+  - [ ] Replace mock data with actual API calls
+  - [ ] Verify API response shape matches frontend expectations
+  - [ ] Ensure property names align (no mapping errors)
+  - [ ] Handle loading, error, and empty states
+  - [ ] Test data renders correctly in UI
+
+**[FE-INT-002] Integration Verification** → Requires FE-INT-001
+- **Description**: End-to-end verification that frontend and backend work together correctly
+- **Story**: Integration
+- **Dependencies**: FE-INT-001
+- **Complexity**: Small
+- **Acceptance Criteria**:
+  - [ ] curl backend endpoints → verify correct response shape
+  - [ ] Browser test → verify data renders correctly
+  - [ ] Test all CRUD operations end-to-end
+  - [ ] Verify error handling works (trigger errors, confirm UI shows them)
+  - [ ] No console errors related to data/API issues
 
 ---
 
@@ -387,18 +478,20 @@ Tasks on same row can run in parallel
 
 ### Parallel Execution Summary
 
-| Phase | Backend Team | Frontend Team | Infra |
-|-------|--------------|---------------|-------|
-| 1 | BE-001, BE-003 | FE-001 | INFRA-001 |
-| 2 | BE-002 | FE-002 | - |
-| 3 | - | FE-003 (integration) | - |
-| 4 | BE-004 | FE-004 (polish) | - |
+| Phase | Backend Team | Frontend Team | Integration | Infra |
+|-------|--------------|---------------|-------------|-------|
+| 1 | BE-001, BE-003 | FE-001 | - | INFRA-001 |
+| 2 | BE-002 | FE-002, FE-003 | - | - |
+| 3 (INT) | - | - | FE-INT-001, FE-INT-002 | - |
+| 4 | BE-004 | FE-004 (polish) | - | - |
+
+> ⚠️ **Phase 3 (Integration) is MANDATORY** - FE-INT tasks verify that frontend and backend work together correctly.
 
 ### Critical Path
 [Identify the longest chain of dependent tasks - this determines minimum timeline]
 
 ```
-Critical Path: BE-001 → BE-002 → FE-003 → FE-004
+Critical Path: BE-001 → BE-002 → FE-INT-001 → FE-INT-002 → FE-004
 ```
 
 ---
@@ -454,6 +547,36 @@ Critical Path: BE-001 → BE-002 → FE-003 → FE-004
 - Group related tasks into "tracks" by theme
 - Each track can have its own dependency chain
 - Tracks can run in parallel until they need to integrate
+
+**⚠️ MANDATORY Integration Tasks (when PRD has both BE and FE):**
+
+When a feature includes BOTH backend and frontend tasks, you MUST include integration tasks. This is NOT optional - skipping integration leads to disconnected FE/BE that don't work together.
+
+Required integration tasks:
+1. **[FE-INT-001] Connect Frontend to Backend**
+   - Wire FE to actual BE endpoints (replace mocks)
+   - Verify API response shapes match FE expectations
+   - Ensure property names align
+
+2. **[FE-INT-002] Integration Verification**
+   - curl + browser verification
+   - End-to-end CRUD testing
+   - Error handling verification
+
+Integration tasks must:
+- Depend on ALL BE tasks and ALL FE UI tasks
+- Be in a later Execution Group (after BE and FE groups complete)
+- Have explicit acceptance criteria for API contract verification
+- Include curl and browser-based validation
+
+Example Execution Groups with Integration:
+```
+| Group | Tasks | Execution | Blocked By |
+|-------|-------|-----------|------------|
+| **Group 1** | BE-001, BE-002, FE-001, FE-002 | ⚡ PARALLEL | None |
+| **Group 2** | BE-003, FE-003 | ⚡ PARALLEL | Group 1 |
+| **Group 3** | FE-INT-001, FE-INT-002 | Sequential | Group 2 |
+```
 
 ---
 
@@ -629,6 +752,11 @@ INSTRUCTIONS FOR /prd:
 - Use task IDs from PRD (BE-001, FE-001, INFRA-001, etc.)
 - Assign appropriate agent type based on task domain
 - Group parallel tasks together, mark with same group number
+
+⚠️ MANDATORY: If PRD has BOTH backend and frontend tasks, you MUST include:
+- FE-INT-001: Connect Frontend to Backend Endpoints
+- FE-INT-002: Integration Verification
+These tasks go in a LATER group that depends on all BE and FE tasks completing.
 -->
 
 ### [TASK-ID]: [Task Title]
@@ -643,6 +771,40 @@ INSTRUCTIONS FOR /prd:
 - **Isolated Files:** findings_[TASK-ID].md, progress_[TASK-ID].md
 
 <!-- Repeat for each task -->
+
+<!-- ⚠️ MANDATORY INTEGRATION TASKS (include when PRD has both BE and FE tasks) -->
+
+### FE-INT-001: Connect Frontend to Backend Endpoints
+- **Group:** [LAST-1] Sequential
+- **Agent:** ui-react-specialist
+- **Status:** pending
+- **Blocked By:** [All BE-* tasks], [All FE-* tasks]
+- **Subtasks:**
+  - [ ] Replace mock data/placeholder API calls with actual backend endpoints
+  - [ ] Verify API response shape matches frontend type definitions
+  - [ ] Ensure property names align (no mapping errors)
+  - [ ] Implement proper loading states during API calls
+  - [ ] Implement error handling for API failures
+  - [ ] Handle empty state when no data returned
+- **Stories:** Integration
+- **Isolated Files:** findings_FE-INT-001.md, progress_FE-INT-001.md
+
+### FE-INT-002: Integration Verification
+- **Group:** [LAST] Sequential
+- **Agent:** ui-react-specialist
+- **Status:** pending
+- **Blocked By:** FE-INT-001
+- **Subtasks:**
+  - [ ] curl each backend endpoint → verify correct response shape
+  - [ ] Browser test → verify data renders correctly for each component
+  - [ ] Test all CRUD operations end-to-end (create, read, update, delete)
+  - [ ] Trigger error conditions → verify UI displays errors correctly
+  - [ ] Check browser console for any data/API related errors
+  - [ ] Verify no TypeScript errors related to API response types
+- **Stories:** Integration
+- **Isolated Files:** findings_FE-INT-002.md, progress_FE-INT-002.md
+
+<!-- END MANDATORY INTEGRATION TASKS -->
 
 ---
 

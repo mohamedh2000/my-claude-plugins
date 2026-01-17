@@ -19,6 +19,109 @@ allowed-tools:
 
 Fork of planning-with-files with support for **parallel sub-agent execution**.
 
+## Entry Point: Initialization
+
+Before starting the workflow, determine file paths and ensure required files exist.
+
+### Step 1: Determine File Paths
+
+**If argument is a file path** (ends with `.md` or contains `/`):
+```
+TASK_PLAN = [provided file path]
+PLAN_DIR = [directory containing the file]
+FINDINGS = [PLAN_DIR]/findings.md
+PROGRESS = [PLAN_DIR]/progress.md
+SUB_AGENT_DIR = [PLAN_DIR]/
+```
+
+**If argument is empty or a description**:
+```
+TASK_PLAN = [project_root]/task_plan.md
+PLAN_DIR = [project_root]
+FINDINGS = [project_root]/findings.md
+PROGRESS = [project_root]/progress.md
+SUB_AGENT_DIR = [project_root]/
+```
+
+> **Note**: `[project_root]` is the current working directory where Claude Code was started.
+
+### Step 2: Verify Task Plan Exists
+
+```
+Read TASK_PLAN file
+If file does not exist:
+  → ERROR: "No task plan found at [TASK_PLAN].
+    Run /prd first to generate a task plan, or provide a valid file path."
+  → STOP
+```
+
+### Step 3: Create Missing Support Files
+
+Check for `findings.md` and `progress.md`. If they don't exist, create them from templates.
+
+**If FINDINGS does not exist:**
+```markdown
+# Findings: [Feature Name from task_plan.md]
+
+## PRD Reference
+[Extract from task_plan.md]
+
+## Architecture Context
+<!-- To be filled during execution -->
+
+## Implementation Notes
+<!-- Add notes during implementation -->
+
+## Research & Discoveries
+<!-- Document findings during implementation -->
+```
+
+**If PROGRESS does not exist:**
+```markdown
+# Progress Log
+
+## Session Info
+- **Feature:** [Feature Name from task_plan.md]
+- **Started:** [Current Date/Time]
+- **Current Group:** 1
+
+---
+
+## Action Log
+
+| Time | Group/Task | Action | Result |
+|------|------------|--------|--------|
+| [now] | Setup | Initialized planning files | ✓ |
+
+---
+
+## Files Modified
+
+### Created
+-
+
+### Modified
+-
+
+---
+
+## Sub-Agent Progress
+<!-- Merged from sub-agent progress files after each group -->
+
+---
+
+## Blockers
+-
+```
+
+### Step 4: Proceed to Execution
+
+After initialization, proceed to read `TASK_PLAN` and begin the parallel execution flow.
+
+Use the determined paths (`TASK_PLAN`, `FINDINGS`, `PROGRESS`, `SUB_AGENT_DIR`) throughout the workflow instead of hardcoded filenames.
+
+---
+
 ## Core Concept
 
 ```
@@ -54,10 +157,10 @@ To avoid race conditions, each sub-agent gets **isolated memory files**:
 
 ```
 SHARED FILES (sub-agents READ only):
-├── task_plan.md          ← Orchestrator owns
-├── findings.md           ← Context for sub-agents
-├── progress.md           ← Context for sub-agents
-└── .claude/Task Documents/PRD-*.md
+├── task_plan.md          ← Orchestrator owns, sub-agents find their task here
+├── findings.md           ← Previous groups' discoveries (API shapes, decisions, patterns)
+├── progress.md           ← Previous groups' file changes (avoid conflicts, understand state)
+└── .claude/Task Documents/PRD-*.md  ← Full requirements
 
 ISOLATED FILES (each sub-agent WRITES to their own):
 ├── findings_[TASK-ID].md    ← Agent's discoveries
@@ -70,10 +173,24 @@ ISOLATED FILES (each sub-agent WRITES to their own):
 
 **2. SPAWN IN BACKGROUND** - For each task in the parallel group:
 - Use Task tool with appropriate agent type
-- **CRITICAL**: Set `run_in_background: true` for ALL parallel agents
+- **⚠️ CRITICAL**: Set `run_in_background: true` for ALL parallel agents
+- **⚠️ NEVER** spawn agents without `run_in_background: true` - this will flood orchestrator context and cause context overflow
 - ALL tasks in group spawn in a SINGLE message (true parallel)
 - Each agent gets their isolated file names
 - Store the returned `output_file` paths and `task_id` for each agent
+
+**Why background execution is mandatory:**
+```
+WITHOUT run_in_background: true:
+  → Orchestrator WAITS for agent to complete
+  → Agent's ENTIRE execution output returns to orchestrator
+  → Orchestrator context fills up fast → CONTEXT OVERFLOW
+
+WITH run_in_background: true:
+  → Agent runs in separate process
+  → Only final summary returns to orchestrator
+  → Orchestrator context stays lean
+```
 
 **3. MONITOR & UPDATE** - While agents execute in background:
 - Use `TaskOutput` tool with `block: false` to check status without blocking
@@ -88,30 +205,42 @@ ISOLATED FILES (each sub-agent WRITES to their own):
 - WRITES: findings_[TASK-ID].md, progress_[TASK-ID].md
 - DOES NOT MODIFY: shared files
 
-**5. MERGE** - After ALL agents in group complete:
-- Read all findings_[TASK-ID].md from the group
-- Append to findings.md under `## [TASK-ID] Findings`
-- Read all progress_[TASK-ID].md from the group
-- Append to progress.md
-- Update task_plan.md statuses
-- Delete sub-agent files (cleanup)
-- **Report to user**: "Group [N] complete. Moving to Group [N+1]..."
+**5. MERGE (MANDATORY)** - After ALL agents in group complete:
 
-**6. CONTINUE** - Proceed to next group
+> ⚠️ **CRITICAL**: Execute the **Post-Group Merge Protocol** below. Do NOT skip this step. Do NOT proceed to next group until merge is verified.
+
+See detailed **Post-Group Merge Protocol** section for step-by-step instructions.
+
+Quick summary:
+1. Read all findings_[TASK-ID].md and progress_[TASK-ID].md
+2. Append to findings.md and progress.md with proper headers
+3. Update task_plan.md statuses to "complete"
+4. **DELETE** sub-agent files (rm findings_[TASK-ID].md progress_[TASK-ID].md)
+5. **VERIFY** merge completed (Glob should not find deleted files)
+6. Report to user: "Group [N] complete and merged. Moving to Group [N+1]..."
+
+**6. CONTINUE** - Only after merge is verified, proceed to next group
 
 ### Sub-Agent Prompt Template
 
-For EACH parallel task, spawn with `run_in_background: true`:
+For EACH parallel task, spawn using the Task tool:
+
+> ⚠️ **MANDATORY**: Set `run_in_background: true` on the Task tool call. Without this, agent output floods orchestrator context → context overflow.
 
 ```
-run_in_background: true
-Agent type: [from task_plan.md - senior-backend-engineer | ui-react-specialist | general-purpose]
+Task tool parameters:
+  - subagent_type: [senior-backend-engineer | ui-react-specialist | general-purpose]
+  - run_in_background: true   ← REQUIRED, never omit
+  - prompt: (see below)
+
+Prompt for the agent:
 
 You are executing [TASK-ID]: [Task Title] for [feature-name].
 
 CONTEXT (read first, DO NOT modify):
 - task_plan.md → Find your task under [TASK-ID]
-- findings.md → Decisions and rationale from discovery
+- findings.md → Decisions and rationale from previous groups (API shapes, patterns, etc.)
+- progress.md → Files created/modified by previous groups (avoid conflicts)
 - .claude/Task Documents/PRD-[name].md → Full requirements
 - .claude/CODEBASE_ARCHITECTURE.md → Codebase patterns
 
@@ -119,50 +248,319 @@ YOUR ISOLATED MEMORY FILES (create and update throughout):
 - findings_[TASK-ID].md → Your discoveries, decisions, technical notes
 - progress_[TASK-ID].md → Your session log: actions, files modified, errors
 
+IMPORTANT: Your progress_[TASK-ID].md file MUST end with an ORCHESTRATOR STATUS marker.
+The orchestrator polls this marker to know when you're done. Update it throughout:
+
+  ORCHESTRATOR STATUS: IN_PROGRESS   ← While working
+  ORCHESTRATOR STATUS: COMPLETE      ← When finished successfully
+  ORCHESTRATOR STATUS: BLOCKED       ← If you hit a blocker you can't resolve
+  ORCHESTRATOR STATUS: CONTINUATION_REQUIRED  ← If you need a fresh agent to continue
+
 EXECUTE:
 Complete all subtasks for [TASK-ID] listed in task_plan.md.
 
 WHEN COMPLETE:
-Return summary: files created/modified, status (complete/blocked), any blockers.
+1. Update progress_[TASK-ID].md with final status and "ORCHESTRATOR STATUS: COMPLETE" at end
+2. Return brief summary (files created/modified, any notes for orchestrator)
 ```
 
+### Sub-Agent Progress File Template
+
+Each sub-agent should create their `progress_[TASK-ID].md` with this structure:
+
+```markdown
+# Progress Log: [TASK-ID] [Task Title]
+
+## Session Start: [Date]
+
+### Task Overview
+[Brief description of what this task accomplishes]
+
+### Actions Log
+- [x] Read task plan and context files
+- [x] Action 1
+- [ ] Action 2 (in progress)
+
+### Files Created
+- `path/to/file1.ts`
+- `path/to/file2.ts`
+
+### Files Modified
+- `path/to/existing.ts` (added X, modified Y)
+
+### Errors Encountered
+- None yet (or list errors)
+
+### Current Status
+**IN_PROGRESS** - Working on [current subtask]
+
+(or)
+
+**COMPLETE** - All subtasks finished. [Brief summary of what was done]
+
+(or)
+
+**BLOCKED** - Cannot proceed because [reason]. Need [what's needed].
+
+### Next Steps
+1. [If in progress, what remains]
+2. [If blocked, what would unblock]
+
+---
+ORCHESTRATOR STATUS: IN_PROGRESS
+```
+
+> ⚠️ **CRITICAL**: The `ORCHESTRATOR STATUS:` line MUST be at the very end of the file. The orchestrator polls this marker to know when you're done. Update it as your status changes.
+
+Valid values:
+- `ORCHESTRATOR STATUS: IN_PROGRESS` - Still working
+- `ORCHESTRATOR STATUS: COMPLETE` - Finished successfully
+- `ORCHESTRATOR STATUS: BLOCKED` - Hit a blocker, need help
+- `ORCHESTRATOR STATUS: CONTINUATION_REQUIRED` - Need fresh agent to continue
+
+---
+
+### Sub-Agent Continuation Protocol (NO COMPACTION - Handoff Only)
+
+**CRITICAL: Sub-agents must NEVER compact their context.** If approaching context limits, they must checkpoint their progress and request a NEW agent to continue. The orchestrator handles spawning the continuation agent.
+
+When a sub-agent approaches context limits:
+
+**1. CHECKPOINT** - Write progress to isolated files:
+```markdown
+## findings_[TASK-ID].md
+### Checkpoint at [timestamp]
+**Completed:**
+- [x] Subtask 1: Created UserModel.js
+- [x] Subtask 2: Added migrations
+
+**In Progress:**
+- [ ] Subtask 3: API endpoints (started, 2 of 5 done)
+
+**Key Decisions:**
+- Using UUID for user IDs because [reason]
+- Skipped soft-delete, using hard-delete because [reason]
+
+**Next Steps:**
+1. Complete remaining 3 endpoints in UserController
+2. Add input validation
+3. Write tests
+```
+
+```markdown
+## progress_[TASK-ID].md
+### Files Modified
+- src/models/UserModel.js (created)
+- src/migrations/001_users.js (created)
+- src/controllers/UserController.js (in progress - 2/5 endpoints)
+
+### Errors Encountered
+- None yet
+
+### Continuation Required
+Status: PARTIAL_COMPLETE
+Reason: Context compaction needed
+Resume from: Subtask 3, endpoint 3 of 5
+```
+
+**2. RETURN WITH CONTINUATION FLAG** - End with:
+```
+STATUS: PARTIAL_COMPLETE
+CONTINUATION_REQUIRED: true
+RESUME_FROM: "Subtask 3 - Create remaining 3 API endpoints"
+FILES_TO_READ: findings_[TASK-ID].md, progress_[TASK-ID].md
+```
+
+**3. ORCHESTRATOR DETECTS & RESPAWNS** - When orchestrator sees `CONTINUATION_REQUIRED`:
+```
+Spawn new agent with:
+- Same [TASK-ID]
+- Add to prompt: "CONTINUATION - Read findings_[TASK-ID].md and progress_[TASK-ID].md first. Previous agent completed subtasks 1-2. Resume from: [RESUME_FROM]"
+```
+
+**4. NEW AGENT READS CHECKPOINT** - Continuation agent:
+- Reads isolated files to understand completed work
+- Skips completed subtasks
+- Resumes from checkpoint
+
 ### Orchestrator Monitoring Loop
+
+> ⚠️ **CRITICAL**: Do NOT use `TaskOutput` to read agent output - it returns the full transcript and floods orchestrator context. Use FILE-BASED polling instead.
 
 While background agents are running, the orchestrator should:
 
 ```
 1. SPAWN all group tasks with run_in_background: true
-   → Store task_id and output_file for each
+   → Agents run in separate processes
+   → Do NOT wait for TaskOutput - it floods context
 
-2. MONITOR LOOP (repeat until all complete):
-   a. For each running agent:
-      - Use TaskOutput with block: false, timeout: 5000
-      - OR Read the output_file to check progress
+2. POLL LOOP (file-based - repeat until all complete):
 
-   b. Report status updates to user:
-      - "⏳ Running: BE-001, FE-001, INFRA-001..."
-      - "✓ BE-001 complete: Created user model and migrations"
-      - "✓ FE-001 complete: Built UserProfile component"
-      - "⏳ Still waiting on: INFRA-001..."
+   For each task [TASK-ID] in the current group:
+     a. Read ONLY the last 5 lines of progress_[TASK-ID].md:
+        Read(file_path="progress_[TASK-ID].md", offset=[last_lines], limit=5)
 
-   c. If all complete, exit loop
+     b. Check for ORCHESTRATOR STATUS marker:
+        - "ORCHESTRATOR STATUS: IN_PROGRESS" → Still working
+        - "ORCHESTRATOR STATUS: COMPLETE" → Done
+        - "ORCHESTRATOR STATUS: BLOCKED" → Needs help
+        - "ORCHESTRATOR STATUS: CONTINUATION_REQUIRED" → Spawn new agent
 
-3. MERGE results from all agents
-4. CONTINUE to next group
+     c. Track status for each task
+
+   If all tasks show COMPLETE or BLOCKED → exit loop
+   Else → wait briefly, repeat
+
+3. REPORT to user:
+   - "✓ BE-001 complete"
+   - "✓ FE-001 complete"
+   - "⚠️ INFRA-001 blocked: [reason]"
+
+4. ⚠️ MERGE (MANDATORY - DO NOT SKIP):
+   → Execute Post-Group Merge Protocol
+   → Read each findings_[TASK-ID].md → Append to findings.md
+   → Read each progress_[TASK-ID].md → Append to progress.md
+   → Update task_plan.md statuses to "complete"
+   → DELETE all sub-agent files (rm findings_*.md progress_*.md for this group)
+   → VERIFY merge (Glob should not find deleted files)
+
+5. CONTINUE to next group (only after merge verified)
 ```
 
-### Post-Group Merge Checklist
+**Why file-based polling:**
+- `TaskOutput` returns full agent transcript → floods orchestrator context
+- Reading last 5 lines of progress file → minimal context usage
+- Sub-agents write `ORCHESTRATOR STATUS:` at end of their progress file
+- Orchestrator only reads the status marker, not full file
 
-After ALL agents in a parallel group complete:
+> ⚠️ **CRITICAL**: Step 4 (MERGE) is NOT optional. You MUST merge and delete sub-agent files before proceeding. See **Post-Group Merge Protocol** for detailed steps.
 
-- [ ] Collect all findings_[TASK-ID].md files from the group
-- [ ] Append each to findings.md under appropriate headers
-- [ ] Collect all progress_[TASK-ID].md files from the group
-- [ ] Append each to progress.md
-- [ ] Update task_plan.md: Mark all group tasks as complete
-- [ ] Log any errors to Errors Encountered table
-- [ ] Delete all sub-agent isolated files
-- [ ] Check if next group is unblocked, proceed accordingly
+### Post-Group Merge Protocol (MANDATORY)
+
+> ⚠️ **CRITICAL**: You MUST execute this merge protocol after ALL agents in a group complete. Do NOT skip any steps. Do NOT proceed to the next group until merge is verified complete.
+
+**STEP 1: VERIFY ALL AGENTS COMPLETE**
+```
+For each task in the group:
+  - Confirm TaskOutput shows "complete" or agent returned success
+  - If any agent shows CONTINUATION_REQUIRED, spawn continuation first
+  - Do NOT proceed until ALL agents in group are fully done
+```
+
+**STEP 2: COLLECT SUB-AGENT FILES**
+```
+Use Glob to find all isolated files for this group:
+  - findings_BE-*.md, findings_FE-*.md, etc.
+  - progress_BE-*.md, progress_FE-*.md, etc.
+
+For each task [TASK-ID] in the completed group:
+  - Read findings_[TASK-ID].md (if exists)
+  - Read progress_[TASK-ID].md (if exists)
+```
+
+**STEP 3: MERGE INTO ORCHESTRATOR FILES**
+
+> ⚠️ **IMPORTANT**: Strip the `ORCHESTRATOR STATUS:` line when merging - it's only for polling, not for the permanent record.
+
+For findings.md - use Edit tool to append:
+```markdown
+---
+
+## [TASK-ID] Findings
+> Agent: [agent-type] | Group: [N] | Completed: [timestamp]
+
+[Contents of findings_[TASK-ID].md - EXCLUDE the "ORCHESTRATOR STATUS:" line]
+```
+
+For progress.md - use Edit tool to append:
+```markdown
+---
+
+## [TASK-ID] Progress
+> Agent: [agent-type] | Group: [N] | Completed: [timestamp]
+
+[Contents of progress_[TASK-ID].md - EXCLUDE the "ORCHESTRATOR STATUS:" line]
+```
+
+For task_plan.md - use Edit tool to update status:
+```markdown
+### [TASK-ID]: [Task Title]
+- **Status:** complete  ← Change from "pending" or "in_progress"
+```
+
+**Why label with Task ID:**
+- Next group agents read findings.md and progress.md for context
+- Clear labels help them find relevant info: "What did BE-001 create? What API shape?"
+- Agent type + group number helps understand the flow
+
+**STEP 4: LOG TO SESSION LOG**
+
+Update task_plan.md Session Log table:
+```markdown
+| [timestamp] | Group N | Merged [TASK-ID] findings and progress | Success |
+```
+
+**STEP 5: DELETE SUB-AGENT FILES (CLEANUP)**
+
+> ⚠️ **MUST DELETE** - Leaving these files causes confusion in future runs
+
+Use Bash to delete each sub-agent file:
+```bash
+rm findings_[TASK-ID].md progress_[TASK-ID].md
+```
+
+Repeat for ALL tasks in the completed group.
+
+**STEP 6: VERIFY MERGE**
+
+Before proceeding to next group, verify:
+```
+1. Read findings.md → Confirm [TASK-ID] section exists
+2. Read progress.md → Confirm [TASK-ID] section exists
+3. Read task_plan.md → Confirm status is "complete"
+4. Use Glob "findings_*.md" → Should NOT find deleted files
+5. Use Glob "progress_*.md" → Should NOT find deleted files
+```
+
+If verification fails, go back and fix before continuing.
+
+**STEP 7: REPORT TO USER**
+```
+"✓ Group [N] complete and merged:
+  - [TASK-ID-1]: [brief summary]
+  - [TASK-ID-2]: [brief summary]
+
+Moving to Group [N+1]..."
+```
+
+---
+
+### Merge Protocol Quick Reference
+
+```
+GROUP COMPLETE?
+    │
+    ▼
+┌──────────────────────────────────────────────────────────────────┐
+│ FOR EACH TASK IN GROUP:                                          │
+│   1. Read findings_[TASK-ID].md                                  │
+│   2. Read progress_[TASK-ID].md                                  │
+│   3. Append to findings.md under "## [TASK-ID] Findings"         │
+│      → Include: Agent type, Group #, timestamp                   │
+│      → EXCLUDE: "ORCHESTRATOR STATUS:" line                      │
+│   4. Append to progress.md under "## [TASK-ID] Progress"         │
+│      → Include: Agent type, Group #, timestamp                   │
+│      → EXCLUDE: "ORCHESTRATOR STATUS:" line                      │
+│   5. Update task_plan.md status → "complete"                     │
+│   6. rm findings_[TASK-ID].md progress_[TASK-ID].md              │
+└──────────────────────────────────────────────────────────────────┘
+    │
+    ▼
+VERIFY: Glob "findings_*.md" returns empty for deleted files
+    │
+    ▼
+NEXT GROUP (agents read merged findings.md & progress.md for context)
+```
 
 ---
 
@@ -202,6 +600,58 @@ During parallel execution, ONLY orchestrator writes to:
 - task_plan.md
 - findings.md (via merge)
 - progress.md (via merge)
+
+### 6. MANDATORY Merge After Each Group
+> ⚠️ **NON-NEGOTIABLE**: After each group completes, you MUST:
+> 1. Merge all sub-agent files into orchestrator files
+> 2. Delete sub-agent files after merge
+> 3. Verify merge before proceeding
+
+**Why this matters**: Skipping merge causes:
+- Lost work (sub-agent findings disappear)
+- Stale task statuses (task_plan.md shows wrong state)
+- File clutter (orphaned findings_*.md files accumulate)
+- Context confusion (future agents read outdated info)
+
+### 7. No Compaction for Sub-Agents - Handoff Only
+Sub-agents must **NEVER** compact their context. When approaching limits:
+1. Checkpoint progress to isolated files
+2. Return with `CONTINUATION_REQUIRED: true`
+3. Orchestrator spawns fresh agent to continue
+
+### 8. Orchestrator Context Management
+
+The orchestrator can also run out of context. To prevent this:
+
+**DO:**
+- Always spawn subagents with `run_in_background: true`
+- Poll status via file: Read last 5 lines of `progress_[TASK-ID].md` for `ORCHESTRATOR STATUS:`
+- Read only the sections you need from large files (use offset/limit)
+- After merge, trust that findings.md has the info - don't re-read sub-agent files
+
+**DON'T:**
+- Use `TaskOutput` to read agent output (returns full transcript, floods context)
+- Spawn agents WITHOUT `run_in_background: true` (blocks and returns full output)
+- Re-read entire task_plan.md repeatedly (read once, track state in memory)
+- Keep large file contents in conversation (write to disk instead)
+
+**If orchestrator approaches context limits:**
+1. Write current state to task_plan.md (Current Group, completed tasks)
+2. Write any in-memory findings to findings.md
+3. The next `/planning-parallel` invocation can resume from task_plan.md state
+
+**Context-efficient monitoring pattern:**
+```
+# Poll sub-agent status (minimal context):
+Read(file_path="progress_[TASK-ID].md", offset=[end-5], limit=5)
+  → Check for "ORCHESTRATOR STATUS: COMPLETE"
+
+# Only read full file ONCE when merging:
+if status == "COMPLETE":
+    Read(file_path="findings_[TASK-ID].md")  # Read full file for merge
+    Read(file_path="progress_[TASK-ID].md")  # Read full file for merge
+    # Append to orchestrator files, then delete sub-agent files
+```
 
 ---
 
@@ -269,9 +719,11 @@ After ALL tasks are validated complete (final group done), spawn **5 parallel co
 
 **2. PARTITION** - Split files into 5 roughly equal batches
 
-**3. SPAWN** - Launch 5 parallel `code-simplifier:code-simplifier` agents:
+**3. SPAWN** - Launch 5 parallel `code-simplifier:code-simplifier` agents with `run_in_background: true`:
 
 ```
+run_in_background: true
+
 You are a code simplifier reviewing files from the [feature-name] implementation.
 
 FILES TO REVIEW (batch N of 5):
@@ -294,6 +746,69 @@ Do NOT create new files. Only edit existing files from your batch.
 - Log simplification summary to progress.md
 - Run tests to verify no regressions: `npm test`
 
+**5. PROCEED** - Continue to Code Review Pass
+
+---
+
+## Final Code Review Pass
+
+After code simplification and tests pass, spawn **5 parallel code-reviewer agents** to analyze all changes and provide recommendations.
+
+### Code Review Protocol
+
+**1. PARTITION** - Use same file batches from simplification step
+
+**2. SPAWN** - Launch 5 parallel `feature-dev:code-reviewer` agents with `run_in_background: true`:
+
+```
+run_in_background: true
+
+You are reviewing code changes from the [feature-name] implementation.
+
+FILES TO REVIEW (batch N of 5):
+- [file1.js]
+- [file2.js]
+- ...
+
+REVIEW FOR:
+1. Bugs and logic errors
+2. Security vulnerabilities (OWASP top 10)
+3. Performance issues
+4. Code quality and maintainability
+5. Adherence to project conventions (check CLAUDE.md)
+
+OUTPUT FORMAT:
+For each issue found, report:
+- File and line number
+- Severity: CRITICAL / HIGH / MEDIUM / LOW
+- Description of issue
+- Recommended fix
+
+If no issues found, report "No issues found in batch N"
+```
+
+**3. COLLECT** - After all 5 agents complete:
+- Gather all issues from each agent
+- Filter by confidence (only report issues with ≥80% confidence)
+- Deduplicate similar issues
+
+**4. REPORT** - Present findings to user:
+```markdown
+## Code Review Summary
+
+### Critical Issues (must fix)
+- [file:line] - Description
+
+### High Priority
+- [file:line] - Description
+
+### Recommendations (optional)
+- [file:line] - Description
+
+### Files with No Issues
+- file1.js, file2.js, ...
+```
+
 **5. DONE** - Report final status to user
 
 ---
@@ -307,7 +822,8 @@ This skill is designed to work with `/prd`:
 3. `/planning-parallel` executes the plan
 4. Parallel groups spawn sub-agents
 5. Sequential tasks execute directly
-6. **Final pass: 5 parallel code-simplifier agents clean up all changes**
+6. **Simplification pass: 5 parallel code-simplifier agents clean up changes**
+7. **Review pass: 5 parallel code-reviewer agents analyze and report issues**
 
 ```
 /spawn feature-name
@@ -320,5 +836,7 @@ This skill is designed to work with `/prd`:
     ├── Group 2: Spawn dependent tasks
     ├── Merge results
     ├── Sequential: Testing, Delivery
-    └── Final: 5x code-simplifier agents (parallel)
+    ├── Simplify: 5x code-simplifier agents (parallel)
+    ├── Run tests (verify no regressions)
+    └── Review: 5x code-reviewer agents (parallel) → Report to user
 ```

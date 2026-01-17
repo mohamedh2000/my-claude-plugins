@@ -160,7 +160,7 @@ SHARED FILES (sub-agents READ only):
 ├── task_plan.md          ← Orchestrator owns, sub-agents find their task here
 ├── findings.md           ← Previous groups' discoveries (API shapes, decisions, patterns)
 ├── progress.md           ← Previous groups' file changes (avoid conflicts, understand state)
-└── .claude/Task Documents/PRD-*.md  ← Full requirements
+└── [PLAN_DIR]/PRD.md  ← Full requirements (same folder as task_plan.md)
 
 ISOLATED FILES (each sub-agent WRITES to their own):
 ├── findings_[TASK-ID].md    ← Agent's discoveries
@@ -241,7 +241,7 @@ CONTEXT (read first, DO NOT modify):
 - task_plan.md → Find your task under [TASK-ID]
 - findings.md → Decisions and rationale from previous groups (API shapes, patterns, etc.)
 - progress.md → Files created/modified by previous groups (avoid conflicts)
-- .claude/Task Documents/PRD-[name].md → Full requirements
+- [PLAN_DIR]/PRD.md → Full requirements (same folder as task_plan.md)
 - .claude/CODEBASE_ARCHITECTURE.md → Codebase patterns
 
 YOUR ISOLATED MEMORY FILES (create and update throughout):

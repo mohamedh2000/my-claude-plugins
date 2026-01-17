@@ -10,8 +10,8 @@ Fork of planning-with-files with support for **parallel sub-agent execution**.
 ## Usage
 
 ```
-/planning-parallel                      # Use default task_plan.md
-/planning-parallel .claude/plans/my-feature-plan.md   # Use custom file
+/planning-parallel                                    # Use task_plan.md in project root
+/planning-parallel .claude/PRD-notifications/task_plan.md   # Use PRD folder from /prd
 ```
 
 ## Argument Handling
@@ -67,7 +67,7 @@ SHARED FILES (sub-agents READ only):
 ├── task_plan.md          ← Orchestrator owns
 ├── findings.md           ← Context for sub-agents
 ├── progress.md           ← Context for sub-agents
-└── .claude/Task Documents/PRD-*.md
+└── [PLAN_DIR]/PRD.md     ← Full requirements (same folder as task_plan.md)
 
 ISOLATED FILES (each sub-agent WRITES to their own):
 ├── findings_[TASK-ID].md    ← Agent's discoveries
@@ -122,7 +122,7 @@ You are executing [TASK-ID]: [Task Title] for [feature-name].
 CONTEXT (read first, DO NOT modify):
 - task_plan.md → Find your task under [TASK-ID]
 - findings.md → Decisions and rationale from discovery
-- .claude/Task Documents/PRD-[name].md → Full requirements
+- [PLAN_DIR]/PRD.md → Full requirements (same folder as task_plan.md)
 - .claude/CODEBASE_ARCHITECTURE.md → Codebase patterns
 
 YOUR ISOLATED MEMORY FILES (create and update throughout):

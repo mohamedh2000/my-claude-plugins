@@ -7,7 +7,7 @@
 Group 1
 
 ## PRD Reference
-`.claude/Task Documents/PRD-[feature-name].md`
+`./PRD.md` (in same folder as this file)
 
 ---
 

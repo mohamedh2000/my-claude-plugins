@@ -32,15 +32,37 @@ This skill follows a 6-phase approach:
 
 ---
 
+## File Structure
+
+All PRD artifacts are stored together in a dedicated folder:
+
+```
+.claude/PRD-[feature-name]/
+├── PRD.md              # The PRD document
+├── task_plan.md        # Execution plan for /planning-parallel
+└── findings.md         # Architecture context from exploration
+```
+
+**Feature name inference:**
+- Derive from user's feature description (kebab-case)
+- Examples: `notifications`, `user-authentication`, `dashboard-analytics`
+- Ask user to confirm if ambiguous
+
+---
+
 ## Phase 0: Check for Existing PRD (Entry Point)
 
-Before starting the workflow, check if an existing PRD file was provided as an argument.
+Before starting the workflow, check if an existing PRD file or folder was provided as an argument.
 
 ### Argument Detection
 
 Check the provided arguments:
-- **If argument is a file path** (ends with `.md` or contains `/`):
-  - Read the file
+- **If argument is a folder path** (e.g., `.claude/PRD-notifications`):
+  - Read `PRD.md` from that folder
+  - Parse the PRD content
+  - Jump to appropriate phase based on PRD status
+- **If argument is a file path** (ends with `.md`):
+  - Read the file directly
   - Parse the PRD content
   - Jump to appropriate phase based on PRD status
 - **If argument is a description** (or empty):
@@ -49,10 +71,10 @@ Check the provided arguments:
 
 ### Loading Existing PRD
 
-If a file path is provided:
+If a path is provided:
 
 ```
-1. Read the PRD file at the provided path
+1. Read the PRD file at the provided path (or PRD.md in the folder)
 2. Check the PRD Status field (Draft | In Review | Approved)
 3. Analyze what sections are complete vs incomplete
 ```
@@ -86,10 +108,10 @@ When loading an existing PRD:
 ### Example Usage
 
 ```
-/prd .claude/Task Documents/PRD-notifications.md
+/prd .claude/PRD-notifications
 ```
 
-Claude reads the file, analyzes completeness, and continues:
+Claude reads `.claude/PRD-notifications/PRD.md`, analyzes completeness, and continues:
 > "I've loaded your PRD for the Notification System. The user stories look complete, but I noticed the API contracts section is empty. Let me ask a few questions:
 > 1. What format should notifications be returned in - paginated list or infinite scroll?
 > 2. Should read/unread status be tracked per-notification or per-user?"
@@ -223,7 +245,16 @@ Before moving to Phase 2, confirm:
 
 ## Phase 3: Documentation - Create the PRD
 
-Generate a structured PRD document at: `.claude/Task Documents/PRD-[feature-name].md`
+### Step 1: Create PRD Folder
+
+First, create the PRD folder if it doesn't exist:
+```
+mkdir -p .claude/PRD-[feature-name]
+```
+
+### Step 2: Generate PRD Document
+
+Create the PRD at: `.claude/PRD-[feature-name]/PRD.md`
 
 ### PRD Structure
 
@@ -599,7 +630,7 @@ Use the Task tool to spawn both agents **in the background** (set `run_in_backgr
 ```
 Subagent type: general-purpose
 run_in_background: true
-Prompt: You are a Senior Project Manager reviewing a PRD. Read the document at .claude/Task Documents/PRD-[feature-name].md and provide a critical analysis:
+Prompt: You are a Senior Project Manager reviewing a PRD. Read the document at .claude/PRD-[feature-name]/PRD.md and provide a critical analysis:
 
 1. **Completeness Check**:
    - Are all user stories complete with acceptance criteria?
@@ -628,7 +659,7 @@ Provide your analysis in a structured format.
 ```
 Subagent type: general-purpose
 run_in_background: true
-Prompt: You are a Senior Software Engineer reviewing a PRD for technical feasibility. Read the document at .claude/Task Documents/PRD-[feature-name].md and provide technical critique:
+Prompt: You are a Senior Software Engineer reviewing a PRD for technical feasibility. Read the document at .claude/PRD-[feature-name]/PRD.md and provide technical critique:
 
 1. **Technical Feasibility**:
    - Are the technical requirements realistic?
@@ -706,11 +737,11 @@ Present the combined feedback to the user:
 
 ## Phase 6: Handoff - Generate Planning Files
 
-After the PRD is approved, generate implementation planning files compatible with `/planning-parallel`:
+After the PRD is approved, generate implementation planning files in the same PRD folder:
 
 ### Generate task_plan.md
 
-Create `task_plan.md` in the **project root** (not in .claude/) with this structure:
+Create `task_plan.md` in `.claude/PRD-[feature-name]/` with this structure:
 
 ```markdown
 # Task Plan: [Feature Name]
@@ -722,7 +753,7 @@ Create `task_plan.md` in the **project root** (not in .claude/) with this struct
 Group 1
 
 ## PRD Reference
-`.claude/Task Documents/PRD-[feature-name].md`
+`.claude/PRD-[feature-name]/PRD.md`
 
 ---
 
@@ -826,13 +857,13 @@ These tasks go in a LATER group that depends on all BE and FE tasks completing.
 
 ### Generate findings.md
 
-Create `findings.md` in the **project root**:
+Create `findings.md` in `.claude/PRD-[feature-name]/`:
 
 ```markdown
 # Findings: [Feature Name]
 
 ## PRD Reference
-`.claude/Task Documents/PRD-[feature-name].md`
+`.claude/PRD-[feature-name]/PRD.md`
 
 ## Architecture Context
 <!-- Copy relevant sections from PRD Section 2 -->
@@ -860,22 +891,32 @@ Create `findings.md` in the **project root**:
 
 After generating files, inform the user:
 
-> "PRD complete! I've also generated `task_plan.md` and `findings.md` in your project root for use with `/planning-parallel`.
+> "PRD complete! All artifacts are in `.claude/PRD-[feature-name]/`:
+> - `PRD.md` - The requirements document
+> - `task_plan.md` - Execution plan
+> - `findings.md` - Architecture context
 >
-> To start implementation, run: `/planning-parallel`"
+> To start implementation, run: `/planning-parallel .claude/PRD-[feature-name]/task_plan.md`"
 
 ---
 
 ## Quick Reference: File Location
 
-All PRDs are stored in: `.claude/Task Documents/`
+All PRD artifacts are stored in: `.claude/PRD-[feature-name]/`
 
-Naming convention: `PRD-[feature-name].md`
+```
+.claude/PRD-[feature-name]/
+├── PRD.md              # The PRD document
+├── task_plan.md        # Execution plan for /planning-parallel
+└── findings.md         # Architecture context from exploration
+```
+
+Naming convention for folders:
 - Use kebab-case for feature names
 - Examples:
-  - `PRD-user-authentication.md`
-  - `PRD-dashboard-analytics.md`
-  - `PRD-payment-integration.md`
+  - `.claude/PRD-user-authentication/`
+  - `.claude/PRD-dashboard-analytics/`
+  - `.claude/PRD-payment-integration/`
 
 ---
 
@@ -899,8 +940,11 @@ Now let me ask some informed questions..."
 
 [... collaborative refinement continues ...]
 
-Claude: [Creates PRD with architecture context, spawns PM + Engineer reviewers, refines based on feedback]
+Claude: [Creates PRD folder, generates PRD.md, spawns PM + Engineer reviewers, refines based on feedback]
 
-Claude: "PRD complete! I've also generated `task_plan.md` and `findings.md` in your project root.
+Claude: "PRD complete! All artifacts are in `.claude/PRD-notifications/`:
+- `PRD.md` - The requirements document
+- `task_plan.md` - Execution plan
+- `findings.md` - Architecture context
 
-To start implementation, run: `/planning-parallel`"
+To start implementation, run: `/planning-parallel .claude/PRD-notifications/task_plan.md`"

@@ -38,10 +38,13 @@ All PRD artifacts are stored together in a dedicated folder:
 
 ```
 .claude/PRD-[feature-name]/
-├── PRD.md              # The PRD document
-├── task_plan.md        # Execution plan for /planning-parallel
-└── findings.md         # Architecture context from exploration
+├── PRD.md                                    # The PRD document
+├── task_plan.md                              # Execution plan for /planning-parallel
+├── findings.md                               # Architecture context from exploration
+└── CODE_ARCHITECTURE_PR-[feature-name].md    # Updated architecture with proposed changes
 ```
+
+The `CODE_ARCHITECTURE_PR-[feature-name].md` is a copy of the project's `CODE_ARCHITECTURE_FEATURES.md` updated to reflect how the architecture would look after implementing the proposed feature. This allows reviewers to see the architectural impact of the PRD.
 
 **Feature name inference:**
 - Derive from user's feature description (kebab-case)
@@ -52,9 +55,202 @@ All PRD artifacts are stored together in a dedicated folder:
 
 ## Phase 0: Check for Existing PRD (Entry Point)
 
-Before starting the workflow, check if an existing PRD file or folder was provided as an argument.
+Before starting the workflow, perform two checks:
+1. **Architecture Features Check**: Ensure project architecture is documented
+2. **Existing PRD Check**: Check if an existing PRD file or folder was provided
 
-### Argument Detection
+### Step 0.1: Check for CODE_ARCHITECTURE_FEATURES.md
+
+**FIRST**, before doing anything else, check if `.claude/CODE_ARCHITECTURE_FEATURES.md` exists:
+
+```
+Read file: .claude/CODE_ARCHITECTURE_FEATURES.md
+```
+
+**If the file does NOT exist**, spawn a background agent to create it:
+
+```
+Subagent type: Explore
+run_in_background: true
+Prompt: You are creating a comprehensive architecture documentation for this project.
+
+Create `.claude/CODE_ARCHITECTURE_FEATURES.md` with the following structure:
+
+# Project Architecture & Features
+
+## Last Updated
+[Current date]
+
+## 1. Project Overview
+- **Name**: [Project name from package.json or directory]
+- **Type**: [Web app, API, CLI, library, etc.]
+- **Description**: [Brief description of what the project does]
+
+## 2. Tech Stack
+
+### Core Technologies
+| Category | Technology | Version |
+|----------|------------|---------|
+| Language | [e.g., TypeScript] | [version] |
+| Framework | [e.g., Next.js] | [version] |
+| Runtime | [e.g., Node.js] | [version] |
+
+### Key Dependencies
+| Package | Purpose | Category |
+|---------|---------|----------|
+| [package] | [what it does] | [UI/State/Data/Auth/etc.] |
+
+## 3. Architecture Diagram
+
+```
+[ASCII diagram showing the high-level architecture]
+Example:
+┌─────────────────────────────────────────────────────────────┐
+│                        CLIENT                               │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
+│  │   Pages     │  │ Components  │  │   State/Stores      │  │
+│  └──────┬──────┘  └──────┬──────┘  └──────────┬──────────┘  │
+│         └────────────────┼───────────────────┘              │
+└─────────────────────────┬───────────────────────────────────┘
+                          │ API Calls
+┌─────────────────────────┴───────────────────────────────────┐
+│                        SERVER                               │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
+│  │   Routes    │  │  Services   │  │   Data Layer        │  │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## 4. Directory Structure
+
+```
+[Root directory structure with explanations]
+project/
+├── src/
+│   ├── components/     # Reusable UI components
+│   ├── pages/          # Route pages
+│   ├── services/       # Business logic & API clients
+│   ├── hooks/          # Custom React hooks
+│   ├── utils/          # Helper functions
+│   └── types/          # TypeScript type definitions
+├── public/             # Static assets
+└── ...
+```
+
+## 5. Features Map
+
+### Implemented Features
+
+| Feature | Description | Key Files | Status |
+|---------|-------------|-----------|--------|
+| [Feature name] | [What it does] | [Main files] | ✅ Complete |
+
+### Feature Flow Diagrams
+
+#### [Feature 1 Name]
+```
+User Action → Component → Hook/Store → API → Backend → Response → UI Update
+```
+
+[Detailed flow for each major feature]
+
+## 6. UI Components Inventory
+
+### Pages
+| Page | Route | Description | Key Components |
+|------|-------|-------------|----------------|
+| [PageName] | /path | [Purpose] | [Components used] |
+
+### Shared Components
+| Component | Location | Props | Used By |
+|-----------|----------|-------|---------|
+| [Component] | [path] | [key props] | [pages/features] |
+
+### Component Hierarchy
+```
+App
+├── Layout
+│   ├── Header
+│   │   ├── Logo
+│   │   └── Navigation
+│   ├── Main Content
+│   │   └── [Page-specific content]
+│   └── Footer
+└── Providers
+    ├── AuthProvider
+    ├── ThemeProvider
+    └── [Other providers]
+```
+
+## 7. Data Flow & State Management
+
+### State Architecture
+[Describe state management approach: Redux, Zustand, Context, etc.]
+
+### Data Fetching Patterns
+[Describe how data is fetched: React Query, SWR, custom hooks, etc.]
+
+### Key Data Models
+| Model | Fields | Relationships |
+|-------|--------|---------------|
+| [Entity] | [key fields] | [related entities] |
+
+## 8. API Structure
+
+### Internal APIs
+| Endpoint | Method | Purpose | Auth Required |
+|----------|--------|---------|---------------|
+| /api/... | GET/POST | [Purpose] | Yes/No |
+
+### External Integrations
+| Service | Purpose | SDK/Method |
+|---------|---------|------------|
+| [Service] | [What for] | [How integrated] |
+
+## 9. Patterns & Conventions
+
+### Code Patterns
+- **Component Pattern**: [Functional/Class, co-location, etc.]
+- **State Pattern**: [How state is managed]
+- **Error Handling**: [How errors are caught/displayed]
+- **Styling Pattern**: [Tailwind, CSS Modules, Styled Components, etc.]
+
+### Naming Conventions
+- Components: PascalCase
+- Files: [convention]
+- Functions: camelCase
+- Constants: UPPER_SNAKE_CASE
+
+### Testing Approach
+[Testing strategy, frameworks used, coverage expectations]
+
+## 10. Dependencies Graph
+
+```
+[Show how major modules depend on each other]
+```
+
+---
+
+**Instructions**:
+1. Explore the entire codebase thoroughly
+2. Map all existing features, pages, and components
+3. Trace data flows and state management
+4. Document all API endpoints
+5. Create accurate diagrams
+6. Be comprehensive - this document will be used for future feature planning
+
+Return a summary of what you documented.
+```
+
+**Continue with the workflow** while the background agent runs. The architecture document will be available for future `/prd` runs.
+
+**If the file DOES exist**, read it and use it as context for the current PRD:
+- Note the existing features to avoid duplication
+- Understand the established patterns to follow
+- Identify potential integration points for new features
+
+### Step 0.2: Argument Detection
 
 Check the provided arguments:
 - **If argument is a folder path** (e.g., `.claude/PRD-notifications`):
@@ -124,13 +320,29 @@ Before asking requirements questions, gain context about the existing project. T
 
 ### Step 1: Read Existing Architecture Knowledge
 
-First, read the living architecture document:
+First, read both architecture documents if they exist:
 
 ```
-Read file: .claude/CODEBASE_ARCHITECTURE.md (in project root)
+Read file: .claude/CODE_ARCHITECTURE_FEATURES.md (comprehensive features/UI map)
+Read file: .claude/CODEBASE_ARCHITECTURE.md (accumulated exploration findings)
 ```
 
-This document contains accumulated knowledge from previous explorations. Use it as a starting point to avoid re-discovering known information.
+**CODE_ARCHITECTURE_FEATURES.md** provides:
+- Complete feature inventory with status
+- UI components hierarchy and relationships
+- Data models and API structure
+- Established patterns and conventions
+
+**CODEBASE_ARCHITECTURE.md** contains:
+- Accumulated knowledge from previous explorations
+- Feature-specific deep dives
+- Integration point discoveries
+
+Use both documents as context to:
+- Avoid proposing features that already exist
+- Follow established patterns and conventions
+- Identify reusable components and integration points
+- Understand the full scope of the current system
 
 ### Step 2: Get Feature Context from User
 
@@ -887,6 +1099,122 @@ Create `findings.md` in `.claude/PRD-[feature-name]/`:
 <!-- Document findings during implementation -->
 ```
 
+### Generate CODE_ARCHITECTURE_PR-[feature-name].md
+
+Create an updated architecture document that shows how the project would look after implementing the proposed feature.
+
+**If `.claude/CODE_ARCHITECTURE_FEATURES.md` exists**, use it as the base. Otherwise, create from scratch based on PRD content.
+
+Create `CODE_ARCHITECTURE_PR-[feature-name].md` in `.claude/PRD-[feature-name]/`:
+
+```markdown
+# Project Architecture & Features (Post-[Feature Name])
+
+> **Note**: This document shows the projected architecture after implementing the [Feature Name] feature.
+> Base document: `.claude/CODE_ARCHITECTURE_FEATURES.md`
+> Related PRD: `.claude/PRD-[feature-name]/PRD.md`
+
+## Proposed Changes Summary
+
+| Section | Change Type | Description |
+|---------|-------------|-------------|
+| Features Map | Addition | [New feature being added] |
+| UI Components | Addition/Modification | [New/modified components] |
+| Data Models | Addition/Modification | [New/modified models] |
+| API Structure | Addition | [New endpoints] |
+
+---
+
+[Copy all sections from CODE_ARCHITECTURE_FEATURES.md, then UPDATE the following sections to reflect the proposed changes:]
+
+## 5. Features Map
+
+### Implemented Features
+[Keep existing features, ADD:]
+
+| Feature | Description | Key Files | Status |
+|---------|-------------|-----------|--------|
+| [Existing features...] | | | ✅ Complete |
+| **[New Feature Name]** | [From PRD overview] | [Proposed files from task plan] | 🚧 Proposed |
+
+### Feature Flow Diagrams
+
+#### [New Feature Name] (Proposed)
+```
+[Create flow diagram based on PRD user stories and technical requirements]
+User Action → [Component] → [Hook/Store] → [API] → [Backend] → Response → UI Update
+```
+
+## 6. UI Components Inventory
+
+### Pages
+[Keep existing, ADD new pages from PRD:]
+
+| Page | Route | Description | Key Components |
+|------|-------|-------------|----------------|
+| [Existing...] | | | |
+| **[NewPage]** | /[route] | [From PRD] | [Proposed components] | 🚧 |
+
+### Shared Components
+[Keep existing, ADD new components from PRD:]
+
+| Component | Location | Props | Used By |
+|-----------|----------|-------|---------|
+| [Existing...] | | | |
+| **[NewComponent]** | [proposed path] | [from PRD] | [proposed usage] | 🚧 |
+
+### Component Hierarchy (Updated)
+```
+[Update hierarchy to show where new components fit]
+```
+
+## 7. Data Flow & State Management
+
+### Key Data Models
+[Keep existing, ADD new models from PRD:]
+
+| Model | Fields | Relationships |
+|-------|--------|---------------|
+| [Existing...] | | |
+| **[NewModel]** | [from PRD data model] | [from PRD] | 🚧 |
+
+## 8. API Structure
+
+### Internal APIs
+[Keep existing, ADD new endpoints from PRD:]
+
+| Endpoint | Method | Purpose | Auth Required |
+|----------|--------|---------|---------------|
+| [Existing...] | | | |
+| **[/api/new]** | [method] | [from PRD] | [from PRD] | 🚧 |
+
+---
+
+## Legend
+- ✅ Complete - Existing, implemented
+- 🚧 Proposed - Part of this PRD, not yet implemented
+
+## Implementation Impact Analysis
+
+### Files to Create
+[List from task_plan.md]
+
+### Files to Modify
+[List existing files that need changes]
+
+### Integration Points
+[Where new feature connects to existing system]
+
+### Potential Conflicts
+[Any areas where new feature might conflict with existing code]
+```
+
+**Important**:
+- Mark all new/modified items with 🚧 to distinguish from existing features
+- Preserve all existing content from CODE_ARCHITECTURE_FEATURES.md
+- Only add/modify sections relevant to the new feature
+- Include an "Implementation Impact Analysis" section to help reviewers understand scope
+
 ### Notify User
 
 After generating files, inform the user:
@@ -895,6 +1223,7 @@ After generating files, inform the user:
 > - `PRD.md` - The requirements document
 > - `task_plan.md` - Execution plan
 > - `findings.md` - Architecture context
+> - `CODE_ARCHITECTURE_PR-[feature-name].md` - Architecture with proposed changes
 >
 > To start implementation, run: `/planning-parallel .claude/PRD-[feature-name]/task_plan.md`"
 
@@ -906,9 +1235,15 @@ All PRD artifacts are stored in: `.claude/PRD-[feature-name]/`
 
 ```
 .claude/PRD-[feature-name]/
-├── PRD.md              # The PRD document
-├── task_plan.md        # Execution plan for /planning-parallel
-└── findings.md         # Architecture context from exploration
+├── PRD.md                                    # The PRD document
+├── task_plan.md                              # Execution plan for /planning-parallel
+├── findings.md                               # Architecture context from exploration
+└── CODE_ARCHITECTURE_PR-[feature-name].md    # Architecture with proposed changes
+```
+
+**Project-level architecture** (created automatically if missing):
+```
+.claude/CODE_ARCHITECTURE_FEATURES.md         # Full project architecture & features map
 ```
 
 Naming convention for folders:
@@ -946,5 +1281,6 @@ Claude: "PRD complete! All artifacts are in `.claude/PRD-notifications/`:
 - `PRD.md` - The requirements document
 - `task_plan.md` - Execution plan
 - `findings.md` - Architecture context
+- `CODE_ARCHITECTURE_PR-notifications.md` - Architecture with proposed changes
 
 To start implementation, run: `/planning-parallel .claude/PRD-notifications/task_plan.md`"

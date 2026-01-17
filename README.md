@@ -48,6 +48,8 @@ For detailed explanations of how these plugins work under the hood:
 - **File-Based Memory** - Nothing important stays only in context; everything persists to disk
 - **Parallel Quality Passes** - 5x code simplifiers + 5x code reviewers run in parallel
 - **Codebase-Aware PRDs** - Discovery phase explores your codebase before asking questions
+- **Auto-Generated Architecture Docs** - Creates comprehensive `CODE_ARCHITECTURE_FEATURES.md` mapping all features, UI components, APIs
+- **Architecture Impact Analysis** - Each PRD includes projected architecture changes for reviewer visibility
 - **Mandatory Integration** - Never ship disconnected frontend/backend again
 
 ---
@@ -108,17 +110,27 @@ Creates comprehensive Product Requirements Documents through a 6-phase collabora
 ```
 
 **Workflow Phases:**
-1. **Exploration** - Analyze codebase architecture
+0. **Architecture Check** - Auto-generates `CODE_ARCHITECTURE_FEATURES.md` if missing (runs in background)
+1. **Exploration** - Analyze codebase architecture using both architecture documents
 2. **Discovery** - Collaborative requirements gathering
 3. **Documentation** - Create structured PRD with user stories
 4. **Review** - Parallel PM + Engineer review
 5. **Refinement** - Incorporate feedback
-6. **Handoff** - Generate `task_plan.md` and `findings.md`
+6. **Handoff** - Generate all planning files including architecture impact
 
 **Output Files:**
-- `.claude/Task Documents/PRD-[feature].md` - Full requirements
-- `task_plan.md` - Execution plan with task groups
-- `findings.md` - Architecture context
+```
+.claude/PRD-[feature-name]/
+├── PRD.md                                    # Full requirements document
+├── task_plan.md                              # Execution plan with task groups
+├── findings.md                               # Architecture context
+└── CODE_ARCHITECTURE_PR-[feature-name].md    # Projected architecture after implementation
+```
+
+**Project-Level (auto-created once):**
+```
+.claude/CODE_ARCHITECTURE_FEATURES.md         # Full project architecture & features map
+```
 
 ---
 
@@ -276,8 +288,10 @@ These plugins are designed to work together for end-to-end feature development:
                       ▼
 ┌─────────────────────────────────────────────────────────────┐
 │  /prd                                                       │
-│  Collaborative requirements gathering and documentation     │
-│  Outputs: PRD document, task_plan.md, findings.md          │
+│  • Auto-creates CODE_ARCHITECTURE_FEATURES.md (if missing) │
+│  • Collaborative requirements gathering and documentation   │
+│  • Outputs: PRD.md, task_plan.md, findings.md,             │
+│             CODE_ARCHITECTURE_PR-[feature].md              │
 └─────────────────────┬───────────────────────────────────────┘
                       ▼
 ┌─────────────────────────────────────────────────────────────┐

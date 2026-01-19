@@ -55,23 +55,45 @@ The `CODE_ARCHITECTURE_PR-[feature-name].md` is a copy of the project's `CODE_AR
 
 ## Phase 0: Check for Existing PRD (Entry Point)
 
-Before starting the workflow, perform two checks:
-1. **Architecture Features Check**: Ensure project architecture is documented
-2. **Existing PRD Check**: Check if an existing PRD file or folder was provided
+Before starting the workflow, perform three checks:
+1. **Create Output Tracking Todo List**: Track all required outputs
+2. **Architecture Features Check**: Ensure project architecture is documented
+3. **Existing PRD Check**: Check if an existing PRD file or folder was provided
+
+### Step 0.0: Create Output Tracking Todo List (MANDATORY)
+
+**FIRST**, create a todo list to track all required PRD outputs. This ensures nothing is missed:
+
+```
+TodoWrite:
+- [ ] Phase 0: Verify/create CODE_ARCHITECTURE_FEATURES.md
+- [ ] Phase 1: Complete codebase exploration
+- [ ] Phase 2: Complete requirements discovery
+- [ ] Phase 3: Create PRD.md
+- [ ] Phase 4: Complete PM review
+- [ ] Phase 4: Complete Engineer review
+- [ ] Phase 5: Refine PRD based on reviews
+- [ ] Phase 6: Create task_plan.md
+- [ ] Phase 6: Create findings.md
+- [ ] Phase 6: Create CODE_ARCHITECTURE_PR-[feature-name].md
+- [ ] Phase 6: VERIFY all 4 files exist
+```
+
+**Update this todo list as you progress through the workflow.** Mark items complete only when verified.
 
 ### Step 0.1: Check for CODE_ARCHITECTURE_FEATURES.md
 
-**FIRST**, before doing anything else, check if `.claude/CODE_ARCHITECTURE_FEATURES.md` exists:
+**NEXT**, check if `.claude/CODE_ARCHITECTURE_FEATURES.md` exists:
 
 ```
 Read file: .claude/CODE_ARCHITECTURE_FEATURES.md
 ```
 
-**If the file does NOT exist**, spawn a background agent to create it:
+**If the file does NOT exist**, spawn an agent to create it (**BLOCKING - wait for completion**):
 
 ```
 Subagent type: Explore
-run_in_background: true
+run_in_background: false   # IMPORTANT: Wait for this to complete
 Prompt: You are creating a comprehensive architecture documentation for this project.
 
 Create `.claude/CODE_ARCHITECTURE_FEATURES.md` with the following structure:
@@ -243,7 +265,15 @@ App
 Return a summary of what you documented.
 ```
 
-**Continue with the workflow** while the background agent runs. The architecture document will be available for future `/prd` runs.
+**WAIT for the agent to complete**, then verify the file was created:
+
+```
+Glob: .claude/CODE_ARCHITECTURE_FEATURES.md
+```
+
+If the file still doesn't exist after the agent completes, report the error to the user and ask if they want to proceed without it or retry.
+
+**Mark todo complete:** `[x] Phase 0: Verify/create CODE_ARCHITECTURE_FEATURES.md`
 
 **If the file DOES exist**, read it and use it as context for the current PRD:
 - Note the existing features to avoid duplication
@@ -398,6 +428,23 @@ After exploration, you should have:
 - **Feature-Specific Context**: Relevant patterns, reusable code, integration points
 - **Informed Starting Point**: Ready to ask smart, context-aware questions
 
+### Step 4: Verification Gate (MANDATORY)
+
+**Before proceeding to Phase 2**, verify the architecture file exists:
+
+```
+Glob: .claude/CODE_ARCHITECTURE_FEATURES.md
+```
+
+**If the file STILL does not exist** (background agent from Phase 0 failed silently, or was skipped):
+1. Inform the user: "The architecture file wasn't created. Creating it now..."
+2. Create it synchronously using the Explore agent (NOT in background)
+3. Verify creation with Glob before proceeding
+
+**Do NOT proceed to Phase 2 until `.claude/CODE_ARCHITECTURE_FEATURES.md` exists.**
+
+**Mark todo complete:** `[x] Phase 1: Complete codebase exploration`
+
 ### Use Exploration to Inform Questions
 
 With codebase context, tailor discovery questions:
@@ -446,12 +493,14 @@ Based on initial answers, probe deeper:
 
 ### Completion Criteria
 
-Before moving to Phase 2, confirm:
+Before moving to Phase 3, confirm:
 - [ ] Core user stories are defined
 - [ ] Acceptance criteria are clear
 - [ ] Technical constraints are understood
 - [ ] Scope boundaries are explicit
 - [ ] User has confirmed: "Yes, this captures what I want to build"
+
+**Mark todo complete:** `[x] Phase 2: Complete requirements discovery`
 
 ---
 
@@ -821,6 +870,8 @@ Example Execution Groups with Integration:
 | **Group 3** | FE-INT-001, FE-INT-002 | Sequential | Group 2 |
 ```
 
+**After creating PRD.md, mark todo complete:** `[x] Phase 3: Create PRD.md`
+
 ---
 
 ## Phase 4: Review - Multi-Agent Critique
@@ -906,9 +957,9 @@ Provide your analysis in a structured format.
 After spawning both review agents in the background:
 
 1. **Monitor Progress**: Use `Read` tool on the `output_file` paths returned by each Task call
-2. **Provide Updates**: As each agent completes, inform the user:
-   - "✓ PM Review complete - analyzing feedback..."
-   - "✓ Engineering Review complete - analyzing feedback..."
+2. **Provide Updates**: As each agent completes, inform the user and mark todo:
+   - "✓ PM Review complete - analyzing feedback..." → `[x] Phase 4: Complete PM review`
+   - "✓ Engineering Review complete - analyzing feedback..." → `[x] Phase 4: Complete Engineer review`
 3. **Use TaskOutput**: You can also use `TaskOutput` tool with `block: false` to check status without waiting
 4. **Compile Feedback**: Once both agents finish, compile their feedback for the refinement phase
 
@@ -944,6 +995,8 @@ Present the combined feedback to the user:
 6. **Generate task_plan.md for /planning-parallel**:
    - After PRD is approved, generate a `task_plan.md` in the project root
    - This enables seamless handoff to `/planning-parallel` for implementation
+
+**After user confirms PRD is approved, mark todo complete:** `[x] Phase 5: Refine PRD based on reviews`
 
 ---
 
@@ -1215,9 +1268,41 @@ User Action → [Component] → [Hook/Store] → [API] → [Backend] → Respons
 - Only add/modify sections relevant to the new feature
 - Include an "Implementation Impact Analysis" section to help reviewers understand scope
 
+### Step 4: File Verification Checklist (MANDATORY - DO NOT SKIP)
+
+**Before declaring PRD complete, you MUST verify ALL 4 files exist.** This is a blocking requirement.
+
+Run these Glob checks:
+
+```
+Glob: .claude/PRD-[feature-name]/PRD.md
+Glob: .claude/PRD-[feature-name]/task_plan.md
+Glob: .claude/PRD-[feature-name]/findings.md
+Glob: .claude/PRD-[feature-name]/CODE_ARCHITECTURE_PR-[feature-name].md
+```
+
+**Verification Checklist:**
+- [ ] `PRD.md` exists and contains complete requirements
+- [ ] `task_plan.md` exists and contains execution groups + tasks
+- [ ] `findings.md` exists and contains architecture context
+- [ ] `CODE_ARCHITECTURE_PR-[feature-name].md` exists and shows proposed changes
+
+**If ANY file is missing:**
+1. Create the missing file immediately
+2. Re-run verification
+3. Do NOT proceed until all 4 files exist
+
+**Update todo list:**
+```
+[x] Phase 6: Create task_plan.md
+[x] Phase 6: Create findings.md
+[x] Phase 6: Create CODE_ARCHITECTURE_PR-[feature-name].md
+[x] Phase 6: VERIFY all 4 files exist
+```
+
 ### Notify User
 
-After generating files, inform the user:
+After generating AND VERIFYING all files, inform the user:
 
 > "PRD complete! All artifacts are in `.claude/PRD-[feature-name]/`:
 > - `PRD.md` - The requirements document

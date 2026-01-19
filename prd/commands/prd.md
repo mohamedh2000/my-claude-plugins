@@ -21,10 +21,18 @@ All PRD artifacts are created in a dedicated folder:
 
 ```
 .claude/PRD-[feature-name]/
-├── PRD.md              # The PRD document
-├── task_plan.md        # Execution plan for /planning-parallel
-└── findings.md         # Architecture context from exploration
+├── PRD.md                                    # The PRD document
+├── task_plan.md                              # Execution plan for /planning-parallel
+├── findings.md                               # Architecture context from exploration
+└── CODE_ARCHITECTURE_PR-[feature-name].md    # Architecture with proposed changes
 ```
+
+**Project-level architecture** (created automatically if missing):
+```
+.claude/CODE_ARCHITECTURE_FEATURES.md         # Full project architecture & features map
+```
+
+**Note:** The workflow will NOT complete until ALL 4 files in the PRD folder are verified to exist.
 
 ## Argument Handling
 

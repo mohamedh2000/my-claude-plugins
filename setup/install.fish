@@ -108,9 +108,11 @@ echo ""
 echo "Step 3: Setting up plugin marketplace..."
 
 if test -d $REPO_DIR
-    create_symlink $REPO_DIR ~/.claude/plugins/marketplaces/my-claude-plugins
+    # Use the repo folder name as the marketplace name
+    set -l marketplace_name (basename $REPO_DIR)
+    create_symlink $REPO_DIR ~/.claude/plugins/marketplaces/$marketplace_name
     set_color green
-    echo "  ✓ Plugin marketplace linked"
+    echo "  ✓ Plugin marketplace linked as: $marketplace_name"
     set_color normal
 else
     set_color yellow

@@ -1,0 +1,28 @@
+{
+  "// NOTE": "Add these hooks to your existing ~/.claude/settings.json",
+
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/skills/continuous-learning/session-start-review.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/skills/continuous-learning/evaluate-session.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

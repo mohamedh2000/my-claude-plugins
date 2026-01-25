@@ -140,21 +140,20 @@ echo "  ✓ Fish profile selector installed"
 set_color normal
 
 # ─────────────────────────────────────────────────────────────
-# Step 5: Install continuous learning system
+# Step 5: Install continuous learning system (symlink to repo)
 # ─────────────────────────────────────────────────────────────
 echo ""
 echo "Step 5: Installing continuous learning system..."
 
-mkdir -p ~/.claude/skills/continuous-learning
-mkdir -p ~/.claude/skills/learn
+# Symlink skills from the repo (not copies)
+create_symlink $REPO_DIR/skills/continuous-learning ~/.claude/skills/continuous-learning
+create_symlink $REPO_DIR/skills/learn ~/.claude/skills/learn
 
-cp -r $SCRIPT_DIR/skills/continuous-learning/* ~/.claude/skills/continuous-learning/
-cp -r $SCRIPT_DIR/skills/learn/* ~/.claude/skills/learn/
-
-chmod +x ~/.claude/skills/continuous-learning/*.sh
+# Make scripts executable
+chmod +x $REPO_DIR/skills/continuous-learning/*.sh 2>/dev/null
 
 set_color green
-echo "  ✓ Continuous learning installed"
+echo "  ✓ Continuous learning installed (symlinked to repo)"
 set_color normal
 
 # ─────────────────────────────────────────────────────────────

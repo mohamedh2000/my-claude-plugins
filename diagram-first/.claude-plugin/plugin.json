@@ -1,0 +1,9 @@
+{
+  "name": "diagram-first",
+  "version": "1.0.0",
+  "description": "Enforces diagram-first architecture: must create and get approval on flow/state diagrams before any implementation",
+  "author": {
+    "name": "mohamedh"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "deep-prd",
+  "version": "1.0.0",
+  "description": "Deep implementation research with parallel specialist agents, multi-reviewer iteration, and file-based persistence for complex product/technical planning",
+  "author": {
+    "name": "mohamedh"
+  },
+  "license": "MIT"
+}

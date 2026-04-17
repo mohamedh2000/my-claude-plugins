@@ -1,7 +1,7 @@
 ---
 name: visibl-company-report
 version: "1.0.0"
-description: Generate a detailed AEO + SEO visibility diagnostic report for a target company in Visibl's Paper/Ink design language. Outputs HTML + PDF. Use when the user asks for "a company report", "AE report", "Visibl report on X", "diagnostic on X", or "research [company] for our platform". Produces a 10-section letter-size diagnostic suitable for handing to an account executive.
+description: Generate a detailed AEO + SEO visibility diagnostic report for a target company in Visibl's Paper/Ink design language. Outputs HTML + PDF. Use when the user asks for "a company report", "AE report", "Visibl report on X", "diagnostic on X", or "research [company] for our platform". Produces a 14-page landscape diagnostic suitable for handing to an account executive.
 user-invocable: true
 allowed-tools:
   - Read
@@ -34,23 +34,23 @@ Output: a self-contained HTML file (browser-native) and a PDF sibling, both writ
 ## When NOT to use
 
 - The target company is already in a Visibl workspace with real scan data → use the Intelligence Hub instead (richer, real pipeline data, not external proxies)
-- You only need the executive summary, not the full 10-section report → write it directly, don't run this skill
+- You only need the executive summary, not the full 14-page report → write it directly, don't run this skill
 
 ---
 
 ## Hard rules (non-negotiable)
 
-1. **The rendered report is a CLIENT-FACING pitch, not an internal audit.** This report is sent by an AE directly to the prospect. Voice rules (see "Voice: soft pitch" below) apply to pages 1-13 and 15. Page 14 (Methodology) keeps a neutral/analytical tone as a credibility anchor.
+1. **The rendered report is a CLIENT-FACING pitch, not an internal audit.** This report is sent by an AE directly to the prospect. Voice rules (see "Voice: soft pitch" below) apply to pages 1-13 and 14. Methodology-style content (scope summary) now lives as a compact strip on page 14 (Progress Snapshot CTA) — it does NOT get its own page. The query list is never shown to the client.
 
 2. **Platform jargon is BANNED in rendered prose.** Never write the name of the target's CMS, storefront, framework, or hosting platform anywhere in a visible page. No "Shopify", "WordPress", "Webflow", "Wix", "Squarespace", "Next.js", "Nuxt", "Gatsby", "BigCommerce", "Magento", "WooCommerce", "PrestaShop", "Contentful", "Sanity", "Strapi". No internal-research jargon either: no "SSR", "client-rendered", "crawl posture", "schema posture", "audit posture", "Puppeteer", "headless Chrome", "JSON-LD" (use "schema markup" instead). Investigation-file notes can use these terms; the rendered report cannot. See the full blocklist in the post-render leak scan.
 
 3. **The template is STRUCTURE ONLY. 100% of prose, numbers, queries, and findings in the final report MUST be generated from the investigation file — NOT copy-pasted from the template.** The Good Culture prose baked into `templates/report.html` is layout scaffolding to show you what shape each page takes. It is NOT a fallback to leave in place. A render that outputs the phrase "One-line hero statement from the company's homepage, verbatim" or a query containing `{CATEGORY}` / `{TARGET_CUSTOMER}` / `{INCUMBENT}` is a BUG — those are template guidance markers, not content. Replace every such marker with real, target-specific content sourced from research.
 
-4. **Queries are vertical-specific and verbatim.** The 8 sample queries on page 14 must be the ACTUAL queries each research agent ran for the target company, tailored per vertical. If the site has a main catalog + academy + wholesale, you show 3 groups of queries labeled by vertical. No `{VERTICAL_CATEGORY}` placeholders. No generic "best X brands" filler.
+4. **Queries are vertical-specific and verbatim.** Category queries run during research must be the ACTUAL queries each agent executed — fully materialized, no placeholder curly-braces. These queries stay INTERNAL to the investigation file; they are NOT rendered in the client-facing report (the query list was removed from page 14 in the 2026-04-17 redesign — clients see scope counts, not the raw queries). No `{VERTICAL_CATEGORY}` placeholders. No generic "best X brands" filler.
 
-5. **Never fabricate data.** If research came up thin on a specific data point, drop it or say so honestly in the Methodology section. A report with honest gaps is stronger than a report with invented numbers.
+5. **Never fabricate data.** If research came up thin on a specific data point, drop it entirely from the rendered report. The scope-summary strip on page 14 is the only visible surface describing what was audited — keep it accurate (actual vertical count, actual query count).
 
-6. **Never change the page structure.** 15 pages, in order, every time. See `templates/section-structure.md`.
+6. **Never change the page structure.** 14 pages, in order, every time. See `templates/section-structure.md`.
 
 7. **Never change the design tokens.** The :root block in `templates/report.html` IS the Visibl Good-Culture identity. Don't introduce new colors, fonts, or card types. No dark cards. No gradient backgrounds. No violet/indigo. If you think a new component is needed, the answer is: use an existing one.
 
@@ -62,17 +62,17 @@ Output: a self-contained HTML file (browser-native) and a PDF sibling, both writ
 
 ---
 
-## Voice: soft pitch (pages 1-13 + 15)
+## Voice: soft pitch (pages 1-13 + 14)
 
-The report is a conversation with the prospect. Not a lab report. Five rules, applied to every page outside page 14:
+The report is a conversation with the prospect. Not a lab report. Five rules, applied to every page of body copy. The scope-summary strip at the bottom of page 14 is the ONLY exception (stays neutral/analytical, see below):
 
 1. **Address the reader as "you" / "your brand" / "your site".** Never refer to the target company in third person in body copy (headlines can use the company name for positioning; findings must switch to "you").
 2. **Frame findings as opportunities, not deficiencies.** "Schema is one of the quickest ways to unlock AI readability" beats "Missing Core Entity Markup: CRITICAL GAP."
-3. **Every page ends on an implication.** The last finding or paragraph hints at what to do about it, without explicitly naming Visibl (the sell is implicit). Visibl is named only on the Cover, Path Forward (page 12), and CTA (page 15).
+3. **Every page ends on an implication.** The last finding or paragraph hints at what to do about it, without explicitly naming Visibl (the sell is implicit). Visibl is named only on the Cover, Path Forward (page 12), and CTA (page 14).
 4. **Numbers stay blunt; language around them softens.** "0 of 8 category queries cited your brand" is fine. Wrap it with "This is the biggest single opportunity on the page — and the one that moves the visibility score fastest."
 5. **Emphasis words in `<strong>` are phrased as insights, not alerts.** "…but AI engines don't know it exists yet" not "…CRITICAL VISIBILITY GAP."
 
-**Page 14 exception:** the Methodology page stays neutral and analytical — it's the credibility anchor. Active voice, completed-work framing, no hedging, but ALSO no second-person "you" addressing. Example methodology line: "Ran 8 category queries across ChatGPT, Perplexity, Gemini, and Claude on 16 April 2026." — not "We ran queries to see where your brand shows up."
+**Page 14 exception:** the scope-of-audit strip embedded inside the CTA page stays neutral and analytical — it's the credibility anchor. Active voice, completed-work framing, no hedging, but ALSO no second-person "you" addressing. Example methodology line: "Ran 4 category queries across ChatGPT, Perplexity, Gemini, and Claude on 16 April 2026." — not "We ran queries to see where your brand shows up."
 
 **Platform-agnostic rewrite examples (apply these patterns every time):**
 | Jargon-y (banned) | Soft-pitch (use instead) |
@@ -103,7 +103,7 @@ The report is a conversation with the prospect. Not a lab report. Five rules, ap
 | Input | Default (use unless user explicitly overrode in their invocation) |
 |---|---|
 | Strategic angle | Balanced (equal AEO + SEO weight) |
-| Page depth | Full (15 pages, Good-Culture taxonomy) |
+| Page depth | Full (14 pages, Good-Culture taxonomy) |
 | AE name | "Visibl Team" |
 | Competitor set | Auto-derive during Agent 2 research (do not pre-seed) |
 | Report date | Today, formatted as the template expects (`MON DD, YYYY` for the cover snapshot eyebrow, `DD Month YYYY` for byline) |
@@ -116,7 +116,7 @@ The report is a conversation with the prospect. Not a lab report. Five rules, ap
 - `{{COMPANY_NAME_ACCENT}}` — the ONE word rendered in orange in the cover hero (e.g. "Visibility" in "Good Culture Visibility Review"). Stays as a separate token in the template so you can swap it thematically without hand-editing HTML.
 - `{{COMPANY_DOMAIN}}` — strip scheme + www (e.g. "https://www.auravinyl.com/" → "auravinyl.com").
 - `{{COMPANY_SLUG}}` — lowercase, hyphenated (e.g. "aura-vinyl").
-- `{{REPORT_DATE}}` — today. Cover snapshot uses `MAR 20, 2026` format; byline on page 15 uses `16 April 2026` format. Same date, two formats.
+- `{{REPORT_DATE}}` — today. Cover snapshot uses `MAR 20, 2026` format; byline on page 14 uses `16 April 2026` format. Same date, two formats.
 - `{{AE_NAME}}` — "Visibl Team" fallback.
 
 ### Phase 1 · Research (3 parallel agents · speed-tuned for ≤10 min total runtime)
@@ -131,7 +131,7 @@ Read `templates/research-briefs.md` first — it contains the exact scope and de
 | Queries per vertical | **4** (down from 8 — still enough for SoV scoring with acceptable variance) |
 | Competitors profiled | **3-4** (page 10 grid shows the 3-4 most cited; skip "emerging" tier to save time) |
 | Research agent model | **Haiku** (`model: claude-haiku-4-5` — ~3× faster than Sonnet/Opus for tool-use research, rate-limit-friendly) |
-| Render model | Sonnet/Opus (your default) — the 15-page render is where quality matters most |
+| Render model | Sonnet/Opus (your default) — the 14-page render is where quality matters most |
 
 **Phase transition MILESTONE markers (print exactly as shown, on their own line):**
 The worker parses stdout for these strings to surface progress to the AE in Discord. Print them at the exact moments named:
@@ -233,7 +233,6 @@ If ANY of these fails → pause the render, report which check failed, and ask t
 | 11 Answer Gap | Specific page-type gaps identified in Agent 3 + Agent 2 (comparison pages missing, explainers missing, FAQ gaps, proof pages) | 4 recommendation cards. Each title is a specific page type (e.g. "Comparison Pages"). Each body explains WHY this target specifically needs it. |
 | 12 Path Forward | Current state (what audit confirmed), 30-day next-sprint items (from Answer Gap recommendations), 60-90d monitoring items | Chip labels describe target-specific actions (e.g. "FAQ pages for cottage cheese shoppers" not "FAQ / educational content") |
 | 13 Next Steps | Target-appropriate timeline derived from Path Forward + audit urgency signals | 4 timeline items with concrete week-level dates |
-| 14 Methodology | **The actual per-vertical query sets Agent 2 ran.** Actual count of URLs audited. List of verticals audited as chips. | NO placeholder queries. NO hedging words ("estimated", "inferred", "proxy", etc. — see section-structure.md voice rules). |
 | 15 CTA | Projected visibility increase (from Path Forward), current health score, current AI mentions count | "Let's keep building." stays. Accent word on "building" stays. Numbers on right rail are real. |
 
 **Post-render leak scan — BEFORE writing the file to disk, grep the rendered HTML for these anti-patterns. If any match, FIX them before writing:**
@@ -334,7 +333,7 @@ open "$OUT_HTML"
 
 Chat reply is 4-6 lines max:
 - Company analyzed
-- 15 pages rendered (Good-Culture taxonomy)
+- 14 pages rendered (Good-Culture taxonomy)
 - File paths (click to open)
 - Accent word used on the cover (e.g. "Visibility")
 - Verticals audited (chips on page 14)

@@ -1,12 +1,12 @@
 # Report Section Structure (v2 · Good-Culture taxonomy)
 
-The Visibl AI Visibility Progress Report has **15 fixed pages**. The taxonomy is hybrid: it follows the platform's canonical AI Visibility Progress Report structure (Good Culture template) with two additional Visibl-native sections (Competitive Landscape · Methodology) inserted.
+The Visibl AI Visibility Progress Report has **14 fixed pages**. The taxonomy is hybrid: it follows the platform's canonical AI Visibility Progress Report structure (Good Culture template) with two additional Visibl-native sections (Competitive Landscape · Methodology) inserted.
 
-Keep the page order identical across every run. Only prose and data points change. Page 1 is always the cover; page 15 is always the closing CTA.
+Keep the page order identical across every run. Only prose and data points change. Page 1 is always the cover; page 14 is always the closing CTA.
 
 ---
 
-## Voice (applies to pages 1-13 + 15)
+## Voice (applies to pages 1-13 + 14)
 
 This report is client-facing — an AE hands it to the prospect. Every page outside page 14 follows a soft-pitch advisor voice:
 
@@ -17,7 +17,7 @@ This report is client-facing — an AE hands it to the prospect. Every page outs
 - **Never mention platform / CMS names** (Shopify, WordPress, Webflow, Next.js, Nuxt, Gatsby, WooCommerce, BigCommerce, Magento, etc.). Use "your site", "the storefront", or the schema type alone.
 - **Never use internal research jargon** — no "crawl posture", "SSR", "JSON-LD" (say "schema markup"), "Puppeteer", "WebFetch". These are audit-tooling words that don't belong in a client artifact.
 
-Page 14 (Methodology) is the credibility anchor — it stays neutral and analytical (active voice, completed-work framing, no "you" addressing).
+(Methodology page has been removed — scope summary is merged into the closing page 14.) — it stays neutral and analytical (active voice, completed-work framing, no "you" addressing).
 
 ---
 
@@ -225,35 +225,17 @@ Page 14 (Methodology) is the credibility anchor — it stays neutral and analyti
 
 ---
 
-## [14] Methodology & Data Sources
+## [14] Progress Snapshot · Let's Keep Building (final page)
 
-**Purpose:** Credibility layer — exactly what was run, which engines were queried, which verticals were audited. Visibl-native section.
-
-**Required elements:**
-- Eyebrow: "Methodology & Data Sources"
-- H1: "How we ran this audit on {{COMPANY_NAME}}"
-- "What we ran" 3-stat row: Category Queries (count), Answer Engines (4), Primary Domain
-- "Verticals audited" chip row (Main catalog, Academy, Wholesale, Install guides, About, Blog — each with a ✓)
-- Right rail: "Sample Queries (Category-Discovery Set)" — 8 query rows with verbatim text and "Run across ChatGPT, Perplexity, Gemini, Claude on {{REPORT_DATE}}" meta
-
-**Voice rules (non-negotiable):**
-- Active voice only. Describe the methodology as completed work.
-- NEVER use: "estimated", "inferred", "proxy", "approximation", "WebSearch-proxied", "simulated", "extrapolated"
-- Describe engine coverage as: "Ran 8 category queries across ChatGPT, Perplexity, Gemini, and Claude on {{REPORT_DATE}}."
-
----
-
-## [15] Progress Snapshot · Let's Keep Building
-
-**Purpose:** Closing CTA. Projected improvement + contact email + "Keep Building →" button.
+**Purpose:** Closing CTA + audit scope summary. Contact email, two headline scores, "Keep Building →" button, and a compact scope-of-audit strip (what was tested — NO query list).
 
 **Required elements:**
 - Eyebrow: "Progress Snapshot"
 - Hero-size title: "Let's keep building." with "building." in orange
 - Subtitle: one-paragraph forward-looking framing
 - Filled orange "Keep Building →" CTA
-- Right rail: 3 big-number rows (Projected Visibility Increase, Current Health Score, Current AI Mentions), then "Get In Touch" with hello@bordlabs.ai and the prepared-for byline
+- Right rail: 2 big-number rows (Current Health Score, Current AI Mentions) — NO "Projected Visibility Increase" — then "Get In Touch" with hello@bordlabs.ai and the prepared-for byline
 
 **Voice:**
 - Forward-looking, collaborative. Not a hard sell.
-- Projected number must match the one used on page 12 (The Path Forward).
+- Scope summary on the left column (below CTA button): 3-stat row (N Category Queries · 4 Answer Engines · {{COMPANY_DOMAIN}}) + verticals-audited chip row. Up to 4 chips. NEVER include the verbatim query list — that is internal.

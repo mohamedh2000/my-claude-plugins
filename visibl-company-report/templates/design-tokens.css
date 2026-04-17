@@ -52,18 +52,30 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 @page {
-  size: 15in 9.4in;
+  size: 1500px 940px;   /* must match .page dims exactly — in-based @page rounds to 1440x902 @ 96dpi and produces blank pages */
   margin: 0;
 }
 
 @media print {
+  html, body {
+    width: 1500px;
+    background: var(--paper);
+  }
   body {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
-    background: var(--paper);
   }
-  .page { page-break-after: always; }
-  .page:last-child { page-break-after: auto; }
+  .page {
+    page-break-after: always;
+    page-break-inside: avoid;
+    break-after: page;
+    break-inside: avoid;
+    margin: 0;
+  }
+  .page:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

@@ -78,19 +78,35 @@
 
     /* ═══════════════════════════════════════════════════════════════════════
        PRINT setup — landscape widescreen, zero margin, color-faithful
-       ═══════════════════════════════════════════════════════════════════════ */
+       ═══════════════════════════════════════════════════════════════════════
+       The @page size MUST match the .page element's pixel dimensions exactly.
+       15in × 9.4in @ 96 DPI = 1440 × 902.4 px — DOES NOT match our 1500×940
+       sections, which causes Chrome to overflow each .page into a near-blank
+       second PDF page. Using explicit px keeps the print size locked. */
     @page {
-      size: 15in 9.4in;
+      size: 1500px 940px;
       margin: 0;
     }
     @media print {
+      html, body {
+        width: 1500px;
+        background: var(--paper);
+      }
       body {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
-        background: var(--paper);
       }
-      .page { page-break-after: always; }
-      .page:last-child { page-break-after: auto; }
+      .page {
+        page-break-after: always;
+        page-break-inside: avoid;
+        break-after: page;
+        break-inside: avoid;
+        margin: 0;
+      }
+      .page:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
     }
 
     /* ═══════════════════════════════════════════════════════════════════════

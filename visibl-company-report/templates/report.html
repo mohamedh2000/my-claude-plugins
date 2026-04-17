@@ -1,0 +1,2114 @@
+<!doctype html>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  VISIBL COMPANY REPORT · TEMPLATE
+  ═══════════════════════════════════════════════════════════════════════════
+
+  This file is a GOLD-STANDARD EXAMPLE with chrome (CSS, section headers, card
+  layouts) intact and body prose from the original Remix Communications report
+  left in place as a STYLE REFERENCE.
+
+  PLACEHOLDERS the skill swaps literally:
+    {{COMPANY_NAME}}         Full company name (e.g. "Notion Labs")
+    {{COMPANY_NAME_COVER}}   Cover title (use <br/> to break across 2 lines)
+    {{COMPANY_DOMAIN}}       Bare domain (e.g. "notion.so")
+    {{AE_NAME}}              Requesting AE's name
+    {{REPORT_DATE}}          Render date (e.g. "16 April 2026")
+
+  SECTION BODIES:
+    All 10 section bodies (company snapshot, AEO scorecard, competitor cards,
+    gap analysis, recommendations, etc.) must be REWRITTEN by the skill using
+    real researched data for the target company. Do NOT leave Remix-specific
+    references in the output. Use the existing prose as tone/shape guidance
+    only (voice, sentence structure, data density).
+
+  DO NOT MODIFY:
+    - The :root CSS tokens (Visibl Paper/Ink system)
+    - The section-header pattern ([NN] ────── LABEL ──────)
+    - Card class names (.card, .dark-card, .comp-card, etc.)
+    - @media print rules (letter-size page breaks)
+
+  Last synced from ~/Desktop/Remix-Communications-Visibl-Report/
+-->
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{COMPANY_NAME}} — AEO + SEO Visibility Diagnostic · Visibl</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ─────────────────────────────────────────────
+       Visibl Design System — scoped to this report
+       Source: /.claude/design-system/design-system.md
+       ───────────────────────────────────────────── */
+    :root {
+      --ink:         #111111;
+      --ink-2:       #444444;
+      --ink-3:       #555555;
+      --ink-4:       #666666;
+      --ink-5:       #888888;
+      --border:      #E5E5E2;
+      --border-sub:  #EEEEEB;
+
+      --green:       #2DA44E;
+      --green-l:     #DAFBE1;
+      --red:         #CF222E;
+      --red-l:       #FFEBE9;
+      --amber:       #BF8700;
+      --amber-l:     #FFF8C5;
+      --blue:        #0969DA;
+      --blue-l:      #DDF4FF;
+      --purple:      #8250DF;
+      --purple-l:    #EDDEFF;
+      --orange:      #FF4F00;
+      --orange-l:    #FFF1E5;
+
+      --chatgpt:     #10A37F;
+      --perplexity:  #20808D;
+      --gemini:      #4285F4;
+      --claude:      #D97706;
+
+      --cream:       #F4EDE1;
+      --cream-edge:  #EFE2C7;
+
+      --radius:      14px;
+      --radius-sm:   8px;
+
+      --font-sans:   'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono:   'JetBrains Mono', 'Courier New', monospace;
+
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.03);
+      --shadow-md: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06), 0 12px 28px rgba(0,0,0,0.04);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #FFFFFF;
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Print setup */
+    @page {
+      size: letter;
+      margin: 0.4in 0.35in;
+    }
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .no-print { display: none !important; }
+      section { page-break-inside: avoid; }
+      .page-break { page-break-before: always; }
+      .avoid-break { page-break-inside: avoid; }
+    }
+
+    .shell {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ─── Section header pattern: [01] ───── SECTION LABEL ─── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 56px 0 20px;
+    }
+    .section-num {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--ink-5);
+      letter-spacing: 0.12em;
+    }
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--ink-3);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+
+    /* Typography */
+    .hero-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 200;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      color: var(--ink);
+      margin: 0;
+    }
+    .hero-subtitle {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--ink-3);
+      line-height: 1.6;
+      margin: 12px 0 0;
+    }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--ink-4);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+    .label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--ink-4);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .value {
+      font-variant-numeric: tabular-nums;
+      font-weight: 200;
+      letter-spacing: -0.03em;
+    }
+    .value-lg { font-size: 42px; }
+    .value-xl { font-size: 56px; }
+    .value-2xl { font-size: 72px; }
+
+    /* Light cards */
+    .card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .card-compact {
+      background: #FFFFFF;
+      border: 1px solid var(--border-sub);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+
+    /* Dark cards */
+    .dark-card {
+      background: linear-gradient(160deg, #171513 0%, #121111 100%);
+      border-radius: var(--radius);
+      padding: 28px;
+      color: var(--cream);
+      border: 1px solid rgba(244,237,225,0.07);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 12px 32px -10px rgba(0,0,0,0.35);
+    }
+    .dark-card .dark-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      color: rgba(244,237,225,0.50);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .dark-card .dark-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      color: rgba(244,237,225,0.45);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+    }
+    .dark-card .dark-value {
+      font-variant-numeric: tabular-nums;
+      font-weight: 200;
+      letter-spacing: -0.04em;
+      color: var(--cream);
+    }
+    .dark-card .dark-muted {
+      color: rgba(244,237,225,0.60);
+    }
+    .dark-card .dark-divider {
+      height: 1px;
+      background: rgba(244,237,225,0.08);
+      margin: 20px 0;
+    }
+
+    /* Grids */
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .bento-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+    .bento-3 { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 16px; }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: #F5F5F4;
+      color: var(--ink-3);
+    }
+    .badge-critical { background: var(--red-l); color: var(--red); }
+    .badge-high { background: var(--amber-l); color: var(--amber); }
+    .badge-moderate { background: var(--blue-l); color: var(--blue); }
+    .badge-success { background: var(--green-l); color: var(--green); }
+    .badge-accent { background: var(--orange-l); color: var(--orange); }
+
+    /* Severity dots */
+    .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; vertical-align: middle; margin-right: 6px; }
+    .dot-red { background: var(--red); }
+    .dot-amber { background: var(--amber); }
+    .dot-blue { background: var(--blue); }
+    .dot-green { background: var(--green); }
+    .dot-orange { background: var(--orange); }
+    .dot-chatgpt { background: var(--chatgpt); }
+    .dot-perplexity { background: var(--perplexity); }
+    .dot-gemini { background: var(--gemini); }
+    .dot-claude { background: var(--claude); }
+
+    /* Tags */
+    .tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--border-sub);
+      color: var(--ink-4);
+      margin-right: 6px;
+      margin-bottom: 4px;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    table thead th {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--ink-4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      background: #FAFAF9;
+    }
+    table tbody td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-sub);
+      vertical-align: top;
+      color: var(--ink-2);
+    }
+    table tbody tr:last-child td { border-bottom: none; }
+    table tbody td.mono { font-family: var(--font-mono); color: var(--ink); }
+    table tbody td strong { color: var(--ink); font-weight: 500; }
+
+    /* H-bars (light bg) */
+    .hbar-track {
+      height: 6px;
+      background: var(--border-sub);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .hbar-fill {
+      height: 100%;
+      background: var(--ink);
+      border-radius: 3px;
+    }
+    .hbar-fill-orange { background: var(--orange); }
+
+    /* Dark engine bars (cream only) */
+    .dark-bar-track {
+      height: 5px;
+      background: rgba(244,237,225,0.06);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .dark-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, rgba(239,226,199,0.20), var(--cream-edge));
+      border-radius: 999px;
+    }
+
+    /* Cover page */
+    .cover {
+      min-height: 10.2in;
+      padding: 0.4in 0.1in 0.6in;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    .cover .cover-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .cover .wordmark {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ink);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .cover .wordmark::after {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: var(--orange);
+      margin-left: 8px;
+      vertical-align: middle;
+      border-radius: 50%;
+    }
+    .cover .cover-meta {
+      text-align: right;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--ink-5);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      line-height: 1.8;
+    }
+    .cover .cover-hero { margin-top: 60px; }
+    .cover .cover-kicker {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--orange);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .cover .cover-title {
+      font-size: 68px;
+      font-weight: 200;
+      letter-spacing: -0.04em;
+      line-height: 1.0;
+      color: var(--ink);
+      margin: 0;
+    }
+    .cover .cover-subtitle {
+      font-size: 22px;
+      font-weight: 300;
+      color: var(--ink-3);
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+      margin: 18px 0 0;
+      max-width: 640px;
+    }
+    .cover .cover-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 32px 0;
+    }
+    .cover .cover-summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .cover .summary-stat {
+      padding: 16px;
+      border: 1px solid var(--border-sub);
+      border-radius: var(--radius);
+    }
+    .cover .summary-stat .label { display: block; margin-bottom: 10px; }
+    .cover .summary-stat .val {
+      font-variant-numeric: tabular-nums;
+      font-weight: 200;
+      font-size: 36px;
+      letter-spacing: -0.04em;
+      color: var(--ink);
+      line-height: 1;
+    }
+    .cover .summary-stat .unit {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--ink-5);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-top: 4px;
+    }
+
+    .cover .cover-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 48px;
+    }
+    .cover .cover-url {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-4);
+      letter-spacing: 0.05em;
+    }
+    .cover .cover-url::before {
+      content: "◉  ";
+      color: var(--orange);
+    }
+
+    /* Hero canvas (dark) */
+    .signal-canvas {
+      background: linear-gradient(160deg, #171513 0%, #121111 100%);
+      border-radius: var(--radius);
+      padding: 32px;
+      color: var(--cream);
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 32px;
+      min-height: 280px;
+      border: 1px solid rgba(244,237,225,0.07);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 20px 48px -16px rgba(0,0,0,0.35);
+    }
+    .signal-canvas .score-block {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .signal-canvas .score-val {
+      font-size: 96px;
+      font-weight: 200;
+      letter-spacing: -0.06em;
+      line-height: 1;
+      color: var(--cream);
+      font-variant-numeric: tabular-nums;
+    }
+    .signal-canvas .score-val .unit { font-size: 22px; color: rgba(244,237,225,0.40); margin-left: 6px; }
+    .signal-canvas .score-delta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #F87171;
+      letter-spacing: 0.08em;
+      margin-top: 14px;
+      text-transform: uppercase;
+    }
+    .signal-canvas .score-period {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: rgba(244,237,225,0.30);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+    .signal-canvas .engine-grid {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+    }
+    .signal-canvas .engine-row {
+      display: grid;
+      grid-template-columns: 110px 1fr 50px;
+      align-items: center;
+      gap: 14px;
+    }
+    .signal-canvas .engine-name {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: rgba(244,237,225,0.75);
+      letter-spacing: 0.04em;
+    }
+    .signal-canvas .engine-val {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--cream);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .signal-canvas .canvas-footer {
+      grid-column: 1 / -1;
+      border-top: 1px solid rgba(244,237,225,0.08);
+      padding-top: 18px;
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+    .signal-canvas .mini-stat { }
+    .signal-canvas .mini-stat .dark-label { margin-bottom: 6px; display:block; }
+    .signal-canvas .mini-stat .dark-value { font-size: 22px; }
+
+    /* KPI strip cards */
+    .kpi {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .kpi .label { display: block; margin-bottom: 14px; }
+    .kpi .value {
+      font-size: 40px;
+      color: var(--ink);
+      display: block;
+      line-height: 1;
+    }
+    .kpi .value .unit {
+      font-size: 14px;
+      color: var(--ink-5);
+      font-weight: 400;
+      margin-left: 4px;
+      letter-spacing: 0;
+    }
+    .kpi .sub {
+      font-size: 12px;
+      color: var(--ink-4);
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+    .kpi.kpi-critical { border-color: var(--red); }
+    .kpi.kpi-critical .value { color: var(--red); }
+
+    /* Narrative block */
+    .narrative {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--orange);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      font-size: 14.5px;
+      line-height: 1.75;
+      color: var(--ink-2);
+    }
+    .narrative strong { color: var(--ink); font-weight: 500; }
+    .narrative .brief-kicker {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--orange);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    /* Checkmark icons */
+    .check-x { color: var(--red); font-weight: 600; }
+    .check-y { color: var(--green); font-weight: 600; }
+    .check-n { color: var(--amber); font-weight: 600; }
+
+    /* Client logos row */
+    .logo-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .logo-chip {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 4px;
+      background: #FAFAF9;
+      border: 1px solid var(--border-sub);
+      color: var(--ink-2);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* Platform label row */
+    .platform-row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .platform-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+    }
+    .platform-chatgpt { color: var(--chatgpt); }
+    .platform-perplexity { color: var(--perplexity); }
+    .platform-gemini { color: var(--gemini); }
+    .platform-claude { color: var(--claude); }
+
+    /* Competitor card */
+    .comp-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+    }
+    .comp-card .comp-name {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--ink);
+      margin: 0;
+    }
+    .comp-card .comp-tagline {
+      font-size: 12px;
+      color: var(--ink-4);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+    .comp-card .comp-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-sub);
+    }
+    .comp-card .comp-stat .label { display: block; margin-bottom: 4px; font-size: 9px; }
+    .comp-card .comp-stat .v {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    /* Recommendation card */
+    .rec-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+    }
+    .rec-card .rec-num {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--orange);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .rec-card .rec-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink);
+      margin: 0 0 10px;
+      line-height: 1.35;
+    }
+    .rec-card .rec-body {
+      font-size: 13px;
+      color: var(--ink-3);
+      line-height: 1.55;
+      margin: 0;
+    }
+    .rec-card .rec-footer {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-sub);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .rec-card .rec-footer .effort {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--ink-5);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* Timeline */
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      margin-top: 24px;
+    }
+    .timeline .phase {
+      padding: 20px;
+      border-right: 1px solid var(--border-sub);
+      position: relative;
+    }
+    .timeline .phase:last-child { border-right: none; }
+    .timeline .phase .phase-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--orange);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .timeline .phase .phase-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink);
+      margin: 0 0 8px;
+    }
+    .timeline .phase .phase-body {
+      font-size: 12px;
+      color: var(--ink-4);
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    /* Footer */
+    .report-footer {
+      margin-top: 80px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--ink-5);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .report-footer .left::before {
+      content: "◉  ";
+      color: var(--orange);
+    }
+
+    /* Insight callout (orange tint) */
+    .insight {
+      background: var(--orange-l);
+      border: 1px solid rgba(255,79,0,0.2);
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--ink-2);
+      margin-top: 20px;
+    }
+    .insight strong { color: var(--orange); }
+    .insight .eyebrow { display: block; margin-bottom: 6px; color: var(--orange); }
+
+    /* Inline stat */
+    .inline-stat {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink);
+    }
+
+    /* Margin utilities */
+    .mt-8 { margin-top: 8px; }
+    .mt-12 { margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-20 { margin-top: 20px; }
+    .mt-24 { margin-top: 24px; }
+    .mt-32 { margin-top: 32px; }
+    .mb-0 { margin-bottom: 0; }
+    .mb-8 { margin-bottom: 8px; }
+    .mb-12 { margin-bottom: 12px; }
+    .mb-16 { margin-bottom: 16px; }
+
+    /* Text utilities */
+    .t-center { text-align: center; }
+    .t-right { text-align: right; }
+    .t-muted { color: var(--ink-4); }
+    .t-strong { color: var(--ink); font-weight: 500; }
+    .t-red { color: var(--red); }
+    .t-green { color: var(--green); }
+    .t-orange { color: var(--orange); }
+    .t-amber { color: var(--amber); }
+    .t-mono { font-family: var(--font-mono); }
+
+    /* Engine visibility viz (light) */
+    .engine-light {
+      display: grid;
+      grid-template-columns: 110px 1fr 48px;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 0;
+    }
+    .engine-light + .engine-light { border-top: 1px solid var(--border-sub); }
+    .engine-light .e-name {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .engine-light .e-bar {
+      height: 6px;
+      background: var(--border-sub);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .engine-light .e-bar-fill {
+      height: 100%;
+      background: var(--ink);
+      border-radius: 3px;
+    }
+    .engine-light .e-val {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-align: right;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Query result row */
+    .query-row {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-sub);
+      display: grid;
+      grid-template-columns: 1fr 80px 200px;
+      gap: 16px;
+      align-items: center;
+    }
+    .query-row:last-child { border-bottom: none; }
+    .query-row .q-text {
+      font-size: 13px;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+    .query-row .q-text .q-prefix {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--ink-5);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .query-row .q-status {
+      text-align: center;
+    }
+    .query-row .q-cites {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-3);
+      line-height: 1.5;
+    }
+
+    /* Two-column split for detail sections */
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+  </style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ═══════════════════════════════════════════════ COVER PAGE ═══════════════════════════════════════════════ -->
+<section class="cover">
+  <div class="cover-top">
+    <div class="wordmark">VISIBL · DIAGNOSTIC</div>
+    <div class="cover-meta">
+      Prepared {{REPORT_DATE}}<br/>
+      For {{AE_NAME}}<br/>
+      For Account Team<br/>
+      Confidential
+    </div>
+  </div>
+
+  <div class="cover-hero">
+    <div class="cover-kicker">◉ AEO + SEO Visibility Diagnostic</div>
+    <h1 class="cover-title">{{COMPANY_NAME_COVER}}</h1>
+    <p class="cover-subtitle">A diagnostic of where Remix sits in the AI answer engine and organic search citation graph — and where their closest competitors are already winning that share.</p>
+    <div class="cover-divider"></div>
+    <div class="cover-summary">
+      <div class="summary-stat">
+        <span class="label">AEO Score</span>
+        <div class="val">8<span class="unit" style="font-size:14px; color:var(--ink-5); font-weight:400; margin-left:3px;">/100</span></div>
+        <div class="unit">category queries</div>
+      </div>
+      <div class="summary-stat">
+        <span class="label">Listicle Presence</span>
+        <div class="val">0<span class="unit" style="font-size:14px; color:var(--ink-5); font-weight:400; margin-left:3px;">/8</span></div>
+        <div class="unit">top-rank authorities</div>
+      </div>
+      <div class="summary-stat">
+        <span class="label">Content Freshness</span>
+        <div class="val">441<span class="unit" style="font-size:14px; color:var(--ink-5); font-weight:400; margin-left:3px;">days</span></div>
+        <div class="unit">since last post</div>
+      </div>
+      <div class="summary-stat">
+        <span class="label">Case Studies</span>
+        <div class="val">1<span class="unit" style="font-size:14px; color:var(--ink-5); font-weight:400; margin-left:3px;">live</span></div>
+        <div class="unit">vs 20+ competitors</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-footer">
+    <div class="cover-url">{{COMPANY_DOMAIN}}</div>
+    <div class="cover-meta">
+      Pipeline: AEO v3 · SEO Lab · Competitor Intel<br/>
+      Engines: ChatGPT · Perplexity · Claude · Gemini
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ 01 EXECUTIVE SUMMARY ═══════════════════════════════════════════════ -->
+<section class="page-break">
+  <div class="section-header">
+    <span class="section-num">[01]</span>
+    <span class="section-line"></span>
+    <span class="section-label">Executive Summary</span>
+  </div>
+
+  <div class="signal-canvas">
+    <div class="score-block">
+      <div class="dark-eyebrow">AEO Visibility Index</div>
+      <div class="score-val" style="margin-top: 12px;">8<span class="unit">/100</span></div>
+      <div class="score-delta">▼ Critical · Below category median by 67 pts</div>
+      <div class="score-period">Q2 2026 · Measured across 8 discovery queries × 4 engines</div>
+    </div>
+    <div class="engine-grid">
+      <div class="dark-label" style="margin-bottom: 2px;">Engine Citation Rate</div>
+      <div class="engine-row">
+        <span class="engine-name">ChatGPT</span>
+        <div class="dark-bar-track"><div class="dark-bar-fill" style="width: 0%;"></div></div>
+        <span class="engine-val">0.0%</span>
+      </div>
+      <div class="engine-row">
+        <span class="engine-name">Perplexity</span>
+        <div class="dark-bar-track"><div class="dark-bar-fill" style="width: 12%;"></div></div>
+        <span class="engine-val">12%</span>
+      </div>
+      <div class="engine-row">
+        <span class="engine-name">Claude</span>
+        <div class="dark-bar-track"><div class="dark-bar-fill" style="width: 0%;"></div></div>
+        <span class="engine-val">0.0%</span>
+      </div>
+      <div class="engine-row">
+        <span class="engine-name">Gemini</span>
+        <div class="dark-bar-track"><div class="dark-bar-fill" style="width: 8%;"></div></div>
+        <span class="engine-val">8%</span>
+      </div>
+      <div class="engine-row">
+        <span class="engine-name">Google AI Ovw</span>
+        <div class="dark-bar-track"><div class="dark-bar-fill" style="width: 0%;"></div></div>
+        <span class="engine-val">0.0%</span>
+      </div>
+    </div>
+    <div class="canvas-footer">
+      <div class="mini-stat">
+        <div class="dark-label">Queries tested</div>
+        <div class="dark-value">24</div>
+      </div>
+      <div class="mini-stat">
+        <div class="dark-label">Brand-name lift</div>
+        <div class="dark-value">100%</div>
+      </div>
+      <div class="mini-stat">
+        <div class="dark-label">Category queries</div>
+        <div class="dark-value">0.0%</div>
+      </div>
+      <div class="mini-stat">
+        <div class="dark-label">Competitor cites</div>
+        <div class="dark-value">62</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-4 mt-24">
+    <div class="kpi kpi-critical">
+      <span class="label">Category Discovery</span>
+      <span class="value">0.0<span class="unit">%</span></span>
+      <div class="sub">Zero cites across 8 "best agency" discovery prompts. Buyers searching for a thought-leadership agency never see Remix.</div>
+    </div>
+    <div class="kpi">
+      <span class="label">Listicle Graph</span>
+      <span class="value">0<span class="unit">/8</span></span>
+      <div class="sub">Absent from every authoritative 2026 top-list (ThoughtCred, Animalz, Skale, Content Allies, First Page Sage, Column Five, CSuite, Talks.co).</div>
+    </div>
+    <div class="kpi">
+      <span class="label">Blog Freshness</span>
+      <span class="value">441<span class="unit">d</span></span>
+      <div class="sub">Last published post: 29 Jan 2025. The blog has been dormant for over 14 months. AI engines heavily weight freshness.</div>
+    </div>
+    <div class="kpi">
+      <span class="label">Case-Study Depth</span>
+      <span class="value">1<span class="unit">live</span></span>
+      <div class="sub">Single teaser card (Stitch Fix). Adobe and Apple work lives as unindexed video embeds — invisible to AI engines.</div>
+    </div>
+  </div>
+
+  <div class="narrative mt-24">
+    <span class="brief-kicker">◉ Intelligence Brief</span>
+    {{COMPANY_NAME}} has built a <strong>premium client roster</strong> — Adobe, Apple, Meta, Oracle, Stitch Fix, TEDx, Logitech, Verkada — on the back of <strong>2,000+ speaking placements</strong> and <strong>500+ podcast bookings</strong> over 18 years. That's the portfolio of a category-defining agency. <strong>But the buyer never sees that story.</strong> When a CMO, CEO, or Head of Communications opens ChatGPT, Perplexity, or Claude and asks <em>"who places tech executives as speakers at top events?"</em> — Remix does not appear in the answer. Not once, across 24 live discovery queries spanning four AI engines. Instead, buyers see Interview Connections, Kitcaster (now backed by Moburst), Command Your Brand, BigSpeak, Edelman, and ThoughtCred. The agencies with <strong>less pedigree but more AEO infrastructure</strong> are winning the top-of-funnel.<br/><br/>
+    The gap is not a product problem. It is a <strong>citation graph problem</strong>: zero third-party listicle appearances, a blog dormant since January 2025, one case study card, unindexed video "proof" pages, and a brand SERP diluted by four unrelated "Remix" PR companies. The good news is that every one of these issues is addressable in a 90–180 day AEO remediation program. The bad news is that every month of inaction compounds — competitors like Kitcaster/Moburst are accelerating, and AI engines are entrenching the current citation graph as default authority.
+  </div>
+
+  <div class="insight">
+    <span class="eyebrow">◉ One-Sentence Diagnosis</span>
+    <strong>Remix has the clients, the track record, and the team to be the category leader in thought-leadership placement — but owns none of the citation infrastructure that AI engines use to decide who to recommend. This report maps exactly which competitors are winning that real estate and what it takes to reclaim it.</strong>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ 02 COMPANY SNAPSHOT ═══════════════════════════════════════════════ -->
+<section class="page-break">
+  <div class="section-header">
+    <span class="section-num">[02]</span>
+    <span class="section-line"></span>
+    <span class="section-label">Target Company Snapshot</span>
+  </div>
+
+  <div class="bento-2">
+    <div class="card">
+      <div class="eyebrow mb-8">◉ Organization Profile</div>
+      <h3 style="font-size: 26px; font-weight: 300; letter-spacing: -0.02em; margin: 0 0 6px; color: var(--ink);">{{COMPANY_NAME}}</h3>
+      <div class="t-mono" style="font-size: 11px; color: var(--ink-4); letter-spacing: 0.05em;">{{COMPANY_DOMAIN}} · Los Angeles, CA · Founded 2016</div>
+
+      <p style="font-size: 14px; color: var(--ink-2); line-height: 1.7; margin: 18px 0 0;">
+        Thought-leadership agency specializing in <strong style="color:var(--ink);">speaker placement and podcast guest booking</strong> for executives at Fortune 500 technology brands and high-growth startups. Positions itself as "Reimagine Thought Leadership" with a service mix spanning speaking programs, podcast guesting, content, executive training, and event strategy.
+      </p>
+
+      <div class="grid-3 mt-24" style="gap: 14px;">
+        <div>
+          <div class="label mb-8">Stated Track Record</div>
+          <div class="value" style="font-size: 24px; color: var(--ink);">2,000<span style="font-size:13px; color:var(--ink-5); font-weight:400; letter-spacing:0;">+</span></div>
+          <div class="t-mono" style="font-size: 10px; color: var(--ink-5); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px;">Speaking placements</div>
+        </div>
+        <div>
+          <div class="label mb-8">Podcast Bookings</div>
+          <div class="value" style="font-size: 24px; color: var(--ink);">500<span style="font-size:13px; color:var(--ink-5); font-weight:400; letter-spacing:0;">+</span></div>
+          <div class="t-mono" style="font-size: 10px; color: var(--ink-5); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px;">Guest placements</div>
+        </div>
+        <div>
+          <div class="label mb-8">Years Operating</div>
+          <div class="value" style="font-size: 24px; color: var(--ink);">10<span style="font-size:13px; color:var(--ink-5); font-weight:400; letter-spacing:0;">y</span></div>
+          <div class="t-mono" style="font-size: 10px; color: var(--ink-5); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px;">Founded 2016</div>
+        </div>
+      </div>
+
+      <div class="label mt-24 mb-8">◉ Named Clients (public)</div>
+      <div class="logo-row">
+        <span class="logo-chip">Adobe</span>
+        <span class="logo-chip">Apple</span>
+        <span class="logo-chip">Meta</span>
+        <span class="logo-chip">Oracle</span>
+        <span class="logo-chip">Stitch Fix</span>
+        <span class="logo-chip">TEDx</span>
+        <span class="logo-chip">Logitech</span>
+        <span class="logo-chip">Verkada</span>
+        <span class="logo-chip">Culturati</span>
+      </div>
+    </div>
+
+    <div class="dark-card">
+      <div class="dark-eyebrow">◉ Leadership</div>
+      <div class="dark-value" style="font-size: 22px; margin-top: 12px; line-height: 1.2;">Katy Boos</div>
+      <div class="dark-label" style="margin-top: 4px;">Founder & CEO</div>
+
+      <div class="dark-muted" style="font-size: 12px; line-height: 1.6; margin-top: 14px;">
+        Ex-Apple PR for Media &amp; Entertainment / QuickTime. Co-founded a prior Silicon Valley marketing/PR firm. Member of the Forbes Agency Council. Based in Los Angeles.
+      </div>
+
+      <div class="dark-divider"></div>
+
+      <div class="dark-label">Team Size</div>
+      <div class="dark-value" style="font-size: 42px; margin-top: 6px;">11</div>
+      <div class="dark-muted" style="font-size: 11px; margin-top: 4px;">staff across PR, accounts, speaker coaching, event strategy, design</div>
+
+      <div class="dark-divider"></div>
+
+      <div class="dark-label mb-8">◉ Service Lines</div>
+      <div style="font-size: 12px; color: var(--cream); line-height: 1.85;">
+        · Speaker program placement<br/>
+        · Podcast guest booking<br/>
+        · Thought leadership strategy<br/>
+        · Executive speaking training<br/>
+        · Customer reference programs<br/>
+        · Event strategy &amp; production<br/>
+        · Competitive research &amp; reporting
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-24 avoid-break">
+    <div class="eyebrow mb-12">◉ Website Shape · What The Crawler Sees</div>
+    <div class="grid-4">
+      <div>
+        <div class="label mb-8">Total Pages</div>
+        <div class="value" style="font-size: 32px; color: var(--ink);">24</div>
+        <div class="sub" style="font-size:11px; color:var(--ink-5); margin-top: 6px;">incl. team member sub-pages</div>
+      </div>
+      <div>
+        <div class="label mb-8">Blog Posts</div>
+        <div class="value" style="font-size: 32px; color: var(--ink);">27</div>
+        <div class="sub" style="font-size:11px; color:var(--ink-5); margin-top: 6px;">across 2022–Jan 2025</div>
+      </div>
+      <div>
+        <div class="label mb-8">Case Studies</div>
+        <div class="value" style="font-size: 32px; color: var(--red);">1</div>
+        <div class="sub" style="font-size:11px; color:var(--red); margin-top: 6px;">Stitch Fix teaser only</div>
+      </div>
+      <div>
+        <div class="label mb-8">Video-only Pages</div>
+        <div class="value" style="font-size: 32px; color: var(--amber);">2</div>
+        <div class="sub" style="font-size:11px; color:var(--amber); margin-top: 6px;">Adobe + Stitch Fix · zero text</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ 03 AEO SCORECARD ═══════════════════════════════════════════════ -->
+<section class="page-break">
+  <div class="section-header">
+    <span class="section-num">[03]</span>
+    <span class="section-line"></span>
+    <span class="section-label">Answer Engine Visibility Scorecard</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="eyebrow mb-8">◉ Per-Engine Visibility</div>
+      <p class="t-muted" style="font-size: 12px; line-height: 1.55; margin-top: 6px;">Share of 24 discovery prompts where Remix was cited by name, linked, or referenced as a recommended source.</p>
+
+      <div class="mt-20">
+        <div class="engine-light">
+          <span class="e-name platform-chatgpt">ChatGPT</span>
+          <div class="e-bar"><div class="e-bar-fill" style="width: 0%;"></div></div>
+          <span class="e-val">0.0%</span>
+        </div>
+        <div class="engine-light">
+          <span class="e-name platform-perplexity">Perplexity</span>
+          <div class="e-bar"><div class="e-bar-fill" style="width: 12%;"></div></div>
+          <span class="e-val">12%</span>
+        </div>
+        <div class="engine-light">
+          <span class="e-name platform-claude">Claude</span>
+          <div class="e-bar"><div class="e-bar-fill" style="width: 0%;"></div></div>
+          <span class="e-val">0.0%</span>
+        </div>
+        <div class="engine-light">
+          <span class="e-name platform-gemini">Gemini</span>
+          <div class="e-bar"><div class="e-bar-fill" style="width: 8%;"></div></div>
+          <span class="e-val">8%</span>
+        </div>
+        <div class="engine-light">
+          <span class="e-name t-muted">Google AI Overview</span>
+          <div class="e-bar"><div class="e-bar-fill" style="width: 0%;"></div></div>
+          <span class="e-val">0.0%</span>
+        </div>
+      </div>
+
+      <div class="insight">
+        <span class="eyebrow">◉ Diagnosis</span>
+        The only non-zero citations happen in Perplexity (the engine most aggressive about crawling LinkedIn bios) and Gemini (via Google's own cached brand pages). <strong>Every hit is brand-name driven</strong>, not category-discovery driven. In the two engines executives actually use for vendor research — ChatGPT and Claude — Remix does not exist.
+      </div>
+    </div>
+
+    <div class="dark-card">
+      <div class="dark-eyebrow">◉ Query Intent Mix</div>
+      <div class="dark-muted" style="font-size: 12px; margin-top: 8px;">24 prompts across 4 discovery intents. AI engines handle each intent differently.</div>
+
+      <div class="dark-divider"></div>
+
+      <div style="display: grid; grid-template-columns: 1fr 50px 70px; gap: 14px; align-items: center; padding: 8px 0;">
+        <span class="dark-label">Category Discovery</span>
+        <div class="dark-bar-track"><div class="dark-bar-fill" style="width: 0%;"></div></div>
+        <span style="font-family: var(--font-mono); font-size: 11px; color: var(--cream); text-align: right;">0 / 8</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 50px 70px; gap: 14px; align-items: center; padding: 8px 0; border-top: 1px solid rgba(244,237,225,0.08);">
+        <span class="dark-label">Service-Match</span>
+        <div class="dark-bar-track"><div class="dark-bar-fill" style="width: 0%;"></div></div>
+        <span style="font-family: var(--font-mono); font-size: 11px; color: var(--cream); text-align: right;">0 / 6</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 50px 70px; gap: 14px; align-items: center; padding: 8px 0; border-top: 1px solid rgba(244,237,225,0.08);">
+        <span class="dark-label">Thought Leadership</span>
+        <div class="dark-bar-track"><div class="dark-bar-fill" style="width: 0%;"></div></div>
+        <span style="font-family: var(--font-mono); font-size: 11px; color: var(--cream); text-align: right;">0 / 5</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 50px 70px; gap: 14px; align-items: center; padding: 8px 0; border-top: 1px solid rgba(244,237,225,0.08);">
+        <span class="dark-label">Brand Name</span>
+        <div class="dark-bar-track"><div class="dark-bar-fill" style="width: 100%;"></div></div>
+        <span style="font-family: var(--font-mono); font-size: 11px; color: var(--cream); text-align: right;">5 / 5</span>
+      </div>
+
+      <div class="dark-divider"></div>
+
+      <div class="dark-label">Weighted AEO Index</div>
+      <div class="dark-value" style="font-size: 64px; letter-spacing: -0.06em; margin-top: 4px;">8<span style="font-size:20px; color: rgba(244,237,225,0.40); margin-left:4px;">/100</span></div>
+      <div class="dark-muted" style="font-size: 11px; margin-top: 8px;">Formula: discovery × 0.5 + service × 0.2 + thought-leadership × 0.2 + brand × 0.1.<br/>Brand-search visibility cannot rescue a zero in category discovery.</div>
+    </div>
+  </div>
+
+  <div class="card mt-24 avoid-break">
+    <div class="eyebrow mb-12">◉ Live Query Results · What AI Engines Surface Instead</div>
+
+    <div class="query-row">
+      <div class="q-text">
+        <span class="q-prefix">Category Discovery · #01</span>
+        "Best thought leadership agency for tech executives"
+      </div>
+      <div class="q-status"><span class="badge badge-critical">◉ Absent</span></div>
+      <div class="q-cites"><span class="t-muted">Cited:</span> ThoughtCred, Profile, Red Fan, Polymath, Animalz, Publicize</div>
+    </div>
+    <div class="query-row">
+      <div class="q-text">
+        <span class="q-prefix">Category Discovery · #02</span>
+        "Top speaker placement agencies in the US"
+      </div>
+      <div class="q-status"><span class="badge badge-critical">◉ Absent</span></div>
+      <div class="q-cites"><span class="t-muted">Cited:</span> BigSpeak, Washington Speakers Bureau, Leading Authorities, AAE Speakers, Premiere Speakers</div>
+    </div>
+    <div class="query-row">
+      <div class="q-text">
+        <span class="q-prefix">Category Discovery · #03</span>
+        "Best podcast guest booking agency for CEOs and founders"
+      </div>
+      <div class="q-status"><span class="badge badge-critical">◉ Absent</span></div>
+      <div class="q-cites"><span class="t-muted">Cited:</span> Interview Connections, Kitcaster, Command Your Brand, Expert Bookers, Interview Valet, Fame Connect</div>
+    </div>
+    <div class="query-row">
+      <div class="q-text">
+        <span class="q-prefix">Category Discovery · #04</span>
+        "Thought leadership agency for enterprise tech companies"
+      </div>
+      <div class="q-status"><span class="badge badge-critical">◉ Absent</span></div>
+      <div class="q-cites"><span class="t-muted">Cited:</span> SHIFT Communications, Column Five, Edelman, Walker Sands, Racepoint Global</div>
+    </div>
+    <div class="query-row">
+      <div class="q-text">
+        <span class="q-prefix">Service-Match · #05</span>
+        "How to get booked as a keynote speaker in tech"
+      </div>
+      <div class="q-status"><span class="badge badge-critical">◉ Absent</span></div>
+      <div class="q-cites"><span class="t-muted">Cited:</span> VaynerX, SpeakerFlow, BigSpeak, AAE Speakers</div>
+    </div>
+    <div class="query-row">
+      <div class="q-text">
+        <span class="q-prefix">Service-Match · #06</span>
+        "Agency that places execs at TEDx events"
+      </div>
+      <div class="q-status"><span class="badge badge-critical">◉ Absent</span></div>
+      <div class="q-cites"><span class="t-muted">Cited:</span> BigSpeak (tangentially), no specialist cited</div>
+    </div>
+    <div class="query-row">
+      <div class="q-text">
+        <span class="q-prefix">Service-Match · #07</span>
+        "Who runs speaking programs for Adobe or Meta"
+      </div>
+      <div class="q-status"><span class="badge badge-critical">◉ Absent</span></div>
+      <div class="q-cites"><span class="t-muted">Cited:</span> SHIFT Communications, Column Five (both name Adobe/Meta clients publicly)</div>
+    </div>
+    <div class="query-row">
+      <div class="q-text">
+        <span class="q-prefix">Thought Leadership · #08</span>
+        "Top thought leadership marketing agencies 2026"
+      </div>
+      <div class="q-status"><span class="badge badge-critical">◉ Absent</span></div>
+      <div class="q-cites"><span class="t-muted">Cited:</span> Edelman, FT Longitude, Clarity Global, Brafton, First Page Sage, CSuite Content, Thoughtldr</div>
+    </div>
+    <div class="query-row">
+      <div class="q-text">
+        <span class="q-prefix">Brand · #09</span>
+        "{{COMPANY_NAME}} client results"
+      </div>
+      <div class="q-status"><span class="badge badge-high">◑ Partial</span></div>
+      <div class="q-cites"><span class="t-muted">Cited:</span> {{COMPANY_DOMAIN}}, LinkedIn, ZoomInfo · T. Palmer Agency also surfaces</div>
+    </div>
+    <div class="query-row">
+      <div class="q-text">
+        <span class="q-prefix">Brand · #10</span>
+        "Katy Boos founder"
+      </div>
+      <div class="q-status"><span class="badge badge-success">◉ Present</span></div>
+      <div class="q-cites"><span class="t-muted">Cited:</span> LinkedIn profile (above own team page), Agency Management Institute podcast, Forbes Agency Council</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ 04 CATEGORY VISIBILITY GAP ═══════════════════════════════════════════════ -->
+<section class="page-break">
+  <div class="section-header">
+    <span class="section-num">[04]</span>
+    <span class="section-line"></span>
+    <span class="section-label">The Citation Graph Gap</span>
+  </div>
+
+  <div class="narrative mb-16">
+    <span class="brief-kicker">◉ Why Listicles Matter In The AEO Era</span>
+    When you ask ChatGPT or Claude <em>"what's the best X agency?"</em>, the model does not reason from first principles. It reasons from <strong>what was written on the internet about X agencies</strong> — and it heavily weights <strong>authoritative listicles</strong> (Top N agencies, Best in 2026, etc.) as source material. Those listicles become a de-facto citation graph. If you're not on them, you do not exist in the AI's answer. This is how Interview Connections and BigSpeak — both with thinner client rosters than Remix — dominate the recommendations.
+  </div>
+
+  <div class="card">
+    <div class="eyebrow mb-12">◉ Listicle Presence Audit · Top 2026 Authority Lists</div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 36%;">Listicle</th>
+          <th style="width: 16%;">Publisher</th>
+          <th style="width: 12%;">Year</th>
+          <th style="width: 12%;">Remix?</th>
+          <th>Who's Listed Instead</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Top 25 Thought Leadership Agencies 2026</strong></td>
+          <td class="mono">ThoughtCred</td>
+          <td class="mono">2026</td>
+          <td class="t-center"><span class="check-x">✕</span></td>
+          <td>Edelman, FT Longitude, Clarity Global, Brafton</td>
+        </tr>
+        <tr>
+          <td><strong>Top 13 Thought Leadership Marketing Agencies</strong></td>
+          <td class="mono">Skale</td>
+          <td class="mono">2026</td>
+          <td class="t-center"><span class="check-x">✕</span></td>
+          <td>Brafton, Column Five, Velocity Partners</td>
+        </tr>
+        <tr>
+          <td><strong>Top 8 Thought Leadership Companies to Know</strong></td>
+          <td class="mono">CSuite Content</td>
+          <td class="mono">2025</td>
+          <td class="t-center"><span class="check-x">✕</span></td>
+          <td>Edelman, Thoughtldr</td>
+        </tr>
+        <tr>
+          <td><strong>14 Best Thought Leadership Agencies</strong></td>
+          <td class="mono">Animalz</td>
+          <td class="mono">2025</td>
+          <td class="t-center"><span class="check-x">✕</span></td>
+          <td>Animalz, Column Five, Ahrefs, Gravity Global</td>
+        </tr>
+        <tr>
+          <td><strong>Best Content/SEO/TL Agencies 2026</strong></td>
+          <td class="mono">Column Five</td>
+          <td class="mono">2026</td>
+          <td class="t-center"><span class="check-x">✕</span></td>
+          <td>Omniscient Digital, Velocity Partners, Dentsu</td>
+        </tr>
+        <tr>
+          <td><strong>Top Thought Leadership Marketing Agencies</strong></td>
+          <td class="mono">First Page Sage</td>
+          <td class="mono">2026</td>
+          <td class="t-center"><span class="check-x">✕</span></td>
+          <td>First Page Sage, other SEO-first agencies</td>
+        </tr>
+        <tr>
+          <td><strong>Top 10 Podcast Guest Booking Services</strong></td>
+          <td class="mono">Content Allies</td>
+          <td class="mono">2025</td>
+          <td class="t-center"><span class="check-x">✕</span></td>
+          <td>Interview Connections, Kitcaster, Command Your Brand</td>
+        </tr>
+        <tr>
+          <td><strong>12 Best Podcast Booking Services 2026</strong></td>
+          <td class="mono">Talks.co</td>
+          <td class="mono">2026</td>
+          <td class="t-center"><span class="check-x">✕</span></td>
+          <td>Kitcaster, Interview Valet, Expert Bookers</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid-3 mt-24">
+    <div class="card-compact">
+      <div class="label mb-8">Listicle Score</div>
+      <div class="value" style="font-size: 44px; color: var(--red); letter-spacing: -0.04em;">0<span style="font-size:16px; color:var(--ink-5); font-weight:400; letter-spacing:0;">/8</span></div>
+      <div class="sub" style="font-size: 12px; color: var(--ink-4); margin-top: 8px;">No appearances in any 2025–2026 authority list. AI engines have no third-party citation to ground a recommendation on.</div>
+    </div>
+    <div class="card-compact">
+      <div class="label mb-8">Competitor Avg.</div>
+      <div class="value" style="font-size: 44px; color: var(--ink); letter-spacing: -0.04em;">4.2<span style="font-size:16px; color:var(--ink-5); font-weight:400; letter-spacing:0;">/8</span></div>
+      <div class="sub" style="font-size: 12px; color: var(--ink-4); margin-top: 8px;">Interview Connections appears in 6/8. BigSpeak in 5/8. Even mid-tier competitors average 3–4 appearances.</div>
+    </div>
+    <div class="card-compact">
+      <div class="label mb-8">Brand Gap</div>
+      <div class="value" style="font-size: 44px; color: var(--orange); letter-spacing: -0.04em;">−52<span style="font-size:16px; color:var(--ink-5); font-weight:400; letter-spacing:0;">%</span></div>
+      <div class="sub" style="font-size: 12px; color: var(--ink-4); margin-top: 8px;">Remix's presence in the citation graph is 52 percentage points below the category median. This is the pitch, in one number.</div>
+    </div>
+  </div>
+
+  <div class="insight mt-24">
+    <span class="eyebrow">◉ The Compounding Cost</span>
+    Listicles get <strong>re-indexed every 6–12 months</strong>, and AI engines continuously retrain against them. Each quarter Remix is absent, the citation graph entrenches further around Interview Connections, Kitcaster, BigSpeak et al. The cost of <em>entry</em> into this graph is roughly 8–12 weeks of editor outreach. The cost of <em>entry a year from now</em> is 3–4× that — because you're dislodging an entrenched default, not filling a vacancy.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ 05 COMPETITIVE LANDSCAPE ═══════════════════════════════════════════════ -->
+<section class="page-break">
+  <div class="section-header">
+    <span class="section-num">[05]</span>
+    <span class="section-line"></span>
+    <span class="section-label">Competitive Landscape · Who's Winning Remix's Share</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="comp-card">
+      <span class="badge badge-critical" style="margin-bottom: 10px;">◉ Direct Threat</span>
+      <h4 class="comp-name">Interview Connections</h4>
+      <p class="comp-tagline">Pure-play podcast guest booking, founded 2013 by Jessica Rhodes. 50,000+ interviews booked for 1,000+ coaches. Owns a 12-year-old podcast and a Clutch profile.</p>
+      <div class="comp-meta">
+        <div class="comp-stat">
+          <span class="label">Listicle hits</span>
+          <span class="v">6 / 8</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">Case studies</span>
+          <span class="v">20+ w/ ROI</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">Pricing</span>
+          <span class="v">$250–$3,000/mo</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">Edge</span>
+          <span class="v">Dollar-ROI proof</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <span class="badge badge-critical" style="margin-bottom: 10px;">◉ Accelerating</span>
+      <h4 class="comp-name">Kitcaster · now Moburst</h4>
+      <p class="comp-tagline">Podcast booking agency founded 2019 in Denver. <strong>Acquired by Moburst in April 2025</strong>, gaining global PR, marketing, and content-studio resources. Already outpacing Remix on fresh content.</p>
+      <div class="comp-meta">
+        <div class="comp-stat">
+          <span class="label">Listicle hits</span>
+          <span class="v">5 / 8</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">Parent co</span>
+          <span class="v">Moburst · global</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">Product</span>
+          <span class="v">Story Craft + Studio</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">Edge</span>
+          <span class="v">Acquisition tailwind</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <span class="badge badge-high" style="margin-bottom: 10px;">◉ High Threat</span>
+      <h4 class="comp-name">Command Your Brand</h4>
+      <p class="comp-tagline">Podcast PR and guest-booking agency for founders, CEOs, authors, and consultants. Unique outcomes-based positioning with <strong>guaranteed placements</strong> and minimum audience thresholds per interview.</p>
+      <div class="comp-meta">
+        <div class="comp-stat">
+          <span class="label">Listicle hits</span>
+          <span class="v">4 / 8</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">Differentiator</span>
+          <span class="v">Guaranteed book</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">ICP</span>
+          <span class="v">Founder/CEO/author</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">Edge</span>
+          <span class="v">Outcome language</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <span class="badge badge-high" style="margin-bottom: 10px;">◉ Structural Threat</span>
+      <h4 class="comp-name">BigSpeak Speakers Bureau</h4>
+      <p class="comp-tagline">Founded 1995. 30+ years dominant speakers bureau with hundreds of speaker profiles across <strong>21 paginated tech landing pages</strong>. Dedicated category pages (CEO speakers, Microsoft speakers, female speakers etc.) — a massive SEO moat.</p>
+      <div class="comp-meta">
+        <div class="comp-stat">
+          <span class="label">Listicle hits</span>
+          <span class="v">5 / 8</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">Speaker pages</span>
+          <span class="v">300+ indexed</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">Category pages</span>
+          <span class="v">20+ dedicated</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">Edge</span>
+          <span class="v">30-year SEO flywheel</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <span class="badge badge-moderate" style="margin-bottom: 10px;">◉ Adjacent Threat</span>
+      <h4 class="comp-name">Premiere Speakers Bureau</h4>
+      <p class="comp-tagline">30 years operating, 40,000+ events delivered. Traditional speakers bureau with massive established brand and long-tail search footprint.</p>
+      <div class="comp-meta">
+        <div class="comp-stat">
+          <span class="label">Listicle hits</span>
+          <span class="v">3 / 8</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">Events</span>
+          <span class="v">40,000+</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">Tenure</span>
+          <span class="v">30 yrs</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">Edge</span>
+          <span class="v">Deep legacy SEO</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <span class="badge badge-moderate" style="margin-bottom: 10px;">◉ Most Similar</span>
+      <h4 class="comp-name">T. Palmer Agency</h4>
+      <p class="comp-tagline">Speaker placement + PR hybrid — the closest service-mix mirror to Remix. Publishes under a clean category page structure and shows up adjacent to Remix on brand SERPs.</p>
+      <div class="comp-meta">
+        <div class="comp-stat">
+          <span class="label">Listicle hits</span>
+          <span class="v">2 / 8</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">Service mix</span>
+          <span class="v">PR + Speakers</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">Model</span>
+          <span class="v">Clean landing pages</span>
+        </div>
+        <div class="comp-stat">
+          <span class="label">Edge</span>
+          <span class="v">Direct look-alike</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ 06 SEO AUDIT ═══════════════════════════════════════════════ -->
+<section class="page-break">
+  <div class="section-header">
+    <span class="section-num">[06]</span>
+    <span class="section-line"></span>
+    <span class="section-label">SEO Audit · Public Signal Analysis</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="eyebrow mb-12">◉ Technical SEO</div>
+      <table>
+        <thead>
+          <tr><th style="width: 60%;">Signal</th><th>Status</th><th class="t-right">Severity</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>HTTPS enabled</td><td class="mono t-green">✓ Pass</td><td class="t-right"><span class="badge badge-success">OK</span></td></tr>
+          <tr><td>robots.txt present</td><td class="mono t-green">✓ Open</td><td class="t-right"><span class="badge badge-success">OK</span></td></tr>
+          <tr><td>Sitemap referenced in robots.txt</td><td class="mono t-red">✕ Missing</td><td class="t-right"><span class="badge badge-moderate">Low</span></td></tr>
+          <tr><td>Sitemap.xml present</td><td class="mono t-green">✓ WordPress default</td><td class="t-right"><span class="badge badge-success">OK</span></td></tr>
+          <tr><td>Image sitemap</td><td class="mono t-red">✕ Not present</td><td class="t-right"><span class="badge badge-moderate">Low</span></td></tr>
+          <tr><td>Video sitemap (for Adobe/Stitch Fix pages)</td><td class="mono t-red">✕ Not present</td><td class="t-right"><span class="badge badge-high">Med</span></td></tr>
+          <tr><td>AI crawler blocking (GPTBot, ClaudeBot etc.)</td><td class="mono t-green">✓ None (desired)</td><td class="t-right"><span class="badge badge-success">OK</span></td></tr>
+          <tr><td>Organization schema</td><td class="mono t-red">✕ Not detected</td><td class="t-right"><span class="badge badge-critical">High</span></td></tr>
+          <tr><td>Person schema (team)</td><td class="mono t-red">✕ Not detected</td><td class="t-right"><span class="badge badge-critical">High</span></td></tr>
+          <tr><td>Article schema (blog)</td><td class="mono t-red">✕ Not detected</td><td class="t-right"><span class="badge badge-critical">High</span></td></tr>
+          <tr><td>LocalBusiness schema (LA HQ)</td><td class="mono t-red">✕ Not detected</td><td class="t-right"><span class="badge badge-high">Med</span></td></tr>
+          <tr><td>Review schema (testimonials)</td><td class="mono t-red">✕ No testimonials published</td><td class="t-right"><span class="badge badge-high">Med</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow mb-12">◉ Content Audit</div>
+      <table>
+        <thead>
+          <tr><th style="width: 55%;">Signal</th><th>Value</th><th class="t-right">Flag</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Total pages indexed</td><td class="mono">24</td><td class="t-right"><span class="badge badge-high">Thin</span></td></tr>
+          <tr><td>Total blog posts</td><td class="mono">27</td><td class="t-right"><span class="badge badge-high">Thin</span></td></tr>
+          <tr><td><strong>Days since last post</strong></td><td class="mono t-red"><strong>441</strong></td><td class="t-right"><span class="badge badge-critical">Dormant</span></td></tr>
+          <tr><td>Posts with suspicious bulk lastmod</td><td class="mono t-amber">8 / 27 (30%)</td><td class="t-right"><span class="badge badge-high">Freshness</span></td></tr>
+          <tr><td>Unique case studies (text)</td><td class="mono t-red">1</td><td class="t-right"><span class="badge badge-critical">Severe</span></td></tr>
+          <tr><td>Video-only proof pages</td><td class="mono t-amber">2 (Adobe, Stitch Fix)</td><td class="t-right"><span class="badge badge-high">Unindexable</span></td></tr>
+          <tr><td>Downloadable resources</td><td class="mono">1 (7-tip ebook)</td><td class="t-right"><span class="badge badge-high">Thin</span></td></tr>
+          <tr><td>Original research reports</td><td class="mono t-red">0</td><td class="t-right"><span class="badge badge-critical">Severe</span></td></tr>
+          <tr><td>Topic cluster landing pages</td><td class="mono t-red">0</td><td class="t-right"><span class="badge badge-critical">Severe</span></td></tr>
+          <tr><td>Client testimonials published</td><td class="mono t-red">0</td><td class="t-right"><span class="badge badge-critical">Severe</span></td></tr>
+          <tr><td>Press mentions page</td><td class="mono t-red">0</td><td class="t-right"><span class="badge badge-high">Med</span></td></tr>
+          <tr><td>Awards page</td><td class="mono t-red">0</td><td class="t-right"><span class="badge badge-high">Med</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card mt-24 avoid-break">
+    <div class="eyebrow mb-12">◉ Content Cadence · 2022–2026 Timeline</div>
+    <div style="display: grid; grid-template-columns: 60px 1fr 80px; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-sub);">
+      <div class="t-mono" style="font-size: 11px; color: var(--ink-4);">2022</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width: 11%;"></div></div>
+      <div class="t-mono t-right" style="font-size: 11px;">3 posts</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 60px 1fr 80px; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-sub);">
+      <div class="t-mono" style="font-size: 11px; color: var(--ink-4);">2023</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width: 26%;"></div></div>
+      <div class="t-mono t-right" style="font-size: 11px;">7 posts</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 60px 1fr 80px; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-sub);">
+      <div class="t-mono" style="font-size: 11px; color: var(--ink-4);">2024</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width: 52%;"></div></div>
+      <div class="t-mono t-right" style="font-size: 11px;">14 posts*</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 60px 1fr 80px; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-sub);">
+      <div class="t-mono" style="font-size: 11px; color: var(--ink-4);">2025</div>
+      <div class="hbar-track"><div class="hbar-fill hbar-fill-orange" style="width: 11%;"></div></div>
+      <div class="t-mono t-right" style="font-size: 11px;">3 posts</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 60px 1fr 80px; gap: 12px; align-items: center; padding: 8px 0;">
+      <div class="t-mono" style="font-size: 11px; color: var(--red);">2026</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width: 0%; background: var(--red);"></div></div>
+      <div class="t-mono t-right" style="font-size: 11px; color: var(--red);">0 posts</div>
+    </div>
+    <div class="sub" style="font-size: 11px; color: var(--ink-5); margin-top: 10px; font-style: italic;">
+      * 8 of the 14 "2024" posts share an identical <code class="t-mono">2024-03-09</code> lastmod — a bulk WordPress migration signature that AI engines detect as non-organic freshness.
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ 07 GAP ANALYSIS ═══════════════════════════════════════════════ -->
+<section class="page-break">
+  <div class="section-header">
+    <span class="section-num">[07]</span>
+    <span class="section-line"></span>
+    <span class="section-label">Gap Analysis · Dimension By Dimension</span>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 18%;">Dimension</th>
+          <th style="width: 16%;">Remix Today</th>
+          <th style="width: 18%;">Competitor Winning</th>
+          <th style="width: 18%;">Their Signal</th>
+          <th>The Gap</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Category AEO</strong></td>
+          <td class="mono t-red">0 / 8 listicles</td>
+          <td class="mono">Interview Connections</td>
+          <td class="mono">6 / 8 listicles</td>
+          <td>Zero third-party authority signal. AI engines recommend competitors because competitors are who the internet writes about.</td>
+        </tr>
+        <tr>
+          <td><strong>Case-Study Depth</strong></td>
+          <td class="mono t-red">1 teaser + 2 video-only</td>
+          <td class="mono">Interview Connections</td>
+          <td class="mono">20+ with $-ROI</td>
+          <td>Interview Connections publishes case studies like "$15K sale from one episode → $150K ROI". Remix has Adobe/Meta work but hides it behind unindexable video.</td>
+        </tr>
+        <tr>
+          <td><strong>Blog Freshness</strong></td>
+          <td class="mono t-red">441 days silent</td>
+          <td class="mono">BigSpeak</td>
+          <td class="mono">Weekly cadence</td>
+          <td>BigSpeak has an active blog feed linked from the tech-speakers landing page. Google and all four AI engines weight freshness on agency queries.</td>
+        </tr>
+        <tr>
+          <td><strong>Content Volume</strong></td>
+          <td class="mono t-red">27 posts total</td>
+          <td class="mono">BigSpeak</td>
+          <td class="mono">300+ speaker pages</td>
+          <td>BigSpeak has a category landing page for every vertical (Tech, CEO, Microsoft, Female, Innovation...) — each functions as a paid-for AEO vehicle.</td>
+        </tr>
+        <tr>
+          <td><strong>Topic Clusters</strong></td>
+          <td class="mono t-red">0</td>
+          <td class="mono">BigSpeak / Interview Valet</td>
+          <td class="mono">15+ cluster pages</td>
+          <td>No landing page for "speaker placement for SaaS", "TEDx coaching", "podcast booking for founders". Zero long-tail capture.</td>
+        </tr>
+        <tr>
+          <td><strong>Structured Data</strong></td>
+          <td class="mono t-red">None detected</td>
+          <td class="mono">Larger agencies</td>
+          <td class="mono">Org / Person / Review</td>
+          <td>AI engines parse schema to decide authority. Remix's HTML is invisible to that layer.</td>
+        </tr>
+        <tr>
+          <td><strong>Owned Media</strong></td>
+          <td class="mono t-red">No podcast · sporadic guest</td>
+          <td class="mono">Interview Connections</td>
+          <td class="mono">12-year-old podcast</td>
+          <td>Interview Connections runs their own podcast — it's literally a podcast booking agency <em>with</em> a podcast. Remix has 0 hours of owned audio/video.</td>
+        </tr>
+        <tr>
+          <td><strong>Pricing Transparency</strong></td>
+          <td class="mono t-red">None</td>
+          <td class="mono">The Expert Bookers</td>
+          <td class="mono">$700–$2,520/mo tiers</td>
+          <td>Public pricing captures high-intent searches and pre-qualifies buyers. AI engines treat it as trustworthy signal.</td>
+        </tr>
+        <tr>
+          <td><strong>Brand SERP</strong></td>
+          <td class="mono t-amber">Diluted</td>
+          <td class="mono">Kitcaster</td>
+          <td class="mono">Clean ownership</td>
+          <td>Multiple "Remix" PR companies (remixpr.com, remixmg.com, Remix Media Group) dilute brand ownership. Remix's own team pages lose to LinkedIn in SERP.</td>
+        </tr>
+        <tr>
+          <td><strong>Acquisition Tailwind</strong></td>
+          <td class="mono t-red">None</td>
+          <td class="mono">Kitcaster / Moburst</td>
+          <td class="mono">Global parent resources</td>
+          <td>Kitcaster was just absorbed into Moburst (April 2025), gaining a full marketing engine behind it. Remix is competing solo.</td>
+        </tr>
+        <tr>
+          <td><strong>Geographic Footprint</strong></td>
+          <td class="mono t-amber">LA only</td>
+          <td class="mono">National bureaus</td>
+          <td class="mono">Venue + region pages</td>
+          <td>No location pages ("speaker placement in San Francisco", "Austin SXSW speakers"). Missing local + venue long-tail.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight mt-24">
+    <span class="eyebrow">◉ The Single Sentence Finding</span>
+    <strong>Across 11 dimensions, Remix is structurally behind on 10 and tied on 1.</strong> The only dimension where they have parity is brand-name recall — and even that is diluted by four unrelated "Remix" PR entities.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ 08 RECOMMENDATIONS ═══════════════════════════════════════════════ -->
+<section class="page-break">
+  <div class="section-header">
+    <span class="section-num">[08]</span>
+    <span class="section-line"></span>
+    <span class="section-label">Recommendations · 180-Day Roadmap</span>
+  </div>
+
+  <div class="dark-card">
+    <div class="dark-eyebrow">◉ Roadmap Shape</div>
+    <div class="dark-muted" style="font-size: 13px; line-height: 1.6; margin-top: 10px; max-width: 800px;">
+      14 recommendations, ordered by blast radius. Phase 1 stops the bleeding. Phase 2 builds the citation graph. Phase 3 claims brand authority. Phase 4 converts authority into a moat.
+    </div>
+    <div class="timeline">
+      <div class="phase">
+        <span class="phase-label">Phase 1 · 0–30d</span>
+        <h4 class="phase-title">Stop the bleeding</h4>
+        <p class="phase-body">Break the 14-month silence. Fix bulk-lastmod migration artifact. Ship 3 real case studies.</p>
+      </div>
+      <div class="phase">
+        <span class="phase-label">Phase 2 · 30–90d</span>
+        <h4 class="phase-title">Build AEO assets</h4>
+        <p class="phase-body">Pitch 5+ listicles. Launch 5 topic cluster pages. Wire structured data. Start quarterly research drops.</p>
+      </div>
+      <div class="phase">
+        <span class="phase-label">Phase 3 · 90–180d</span>
+        <h4 class="phase-title">Pursue authority</h4>
+        <p class="phase-body">Launch owned podcast. 12+ Katy Boos guest appearances. Wikipedia entry. Comparison/alternative pages.</p>
+      </div>
+      <div class="phase">
+        <span class="phase-label">Phase 4 · 180d+</span>
+        <h4 class="phase-title">Close the moat</h4>
+        <p class="phase-body">Coaching certification. Remix Index annual ranking. Explore acquisition/merger route to scale AEO firepower.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header mt-32">
+    <span class="section-num">08a</span>
+    <span class="section-line"></span>
+    <span class="section-label">Phase 1 · Immediate (0–30 days)</span>
+  </div>
+
+  <div class="grid-3">
+    <div class="rec-card">
+      <span class="rec-num">R01 · Critical</span>
+      <h4 class="rec-title">Publish a fresh post within 14 days</h4>
+      <p class="rec-body">Break the 14-month silence. Target a high-intent topic tied to the 2026 speaking calendar (SXSW recap, Web Summit preview, Q2 conference predictions). This single action resets the freshness signal across Google + all four AI engines.</p>
+      <div class="rec-footer">
+        <span class="effort">Effort · Low</span>
+        <span class="badge badge-success">Impact · High</span>
+      </div>
+    </div>
+    <div class="rec-card">
+      <span class="rec-num">R02 · Critical</span>
+      <h4 class="rec-title">Fix the 2024-03-09 bulk lastmod</h4>
+      <p class="rec-body">Eight blog posts share an identical <code class="t-mono">2024-03-09</code> lastmod from a bulk WP migration or author update. This is a well-known anti-signal that AI engines penalize for detecting inauthentic freshness. Republish each post with its real publish date.</p>
+      <div class="rec-footer">
+        <span class="effort">Effort · Low</span>
+        <span class="badge badge-success">Impact · High</span>
+      </div>
+    </div>
+    <div class="rec-card">
+      <span class="rec-num">R03 · Critical</span>
+      <h4 class="rec-title">Write 3 real case studies — text-indexed</h4>
+      <p class="rec-body">The Adobe SXSW 2024 work, the Stitch Fix FY22 program, and one of Meta / Apple / Oracle / TEDx. Full narrative format with challenge, approach, results, quotes, metrics. <strong>Video-only pages do not feed AI engines.</strong> Target 1,200+ words each.</p>
+      <div class="rec-footer">
+        <span class="effort">Effort · Medium</span>
+        <span class="badge badge-success">Impact · High</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header mt-32">
+    <span class="section-num">08b</span>
+    <span class="section-line"></span>
+    <span class="section-label">Phase 2 · Build AEO Assets (30–90 days)</span>
+  </div>
+
+  <div class="grid-3">
+    <div class="rec-card">
+      <span class="rec-num">R04 · High</span>
+      <h4 class="rec-title">Pitch 8 authority listicles for inclusion</h4>
+      <p class="rec-body">ThoughtCred, Animalz, First Page Sage, Content Allies, Skale, Column Five, CSuite Content, Talks.co. All update lists yearly. Editor outreach with Remix's credentials + citation-ready data point ("18 years, 2,000 placements, Fortune 500 clients").</p>
+      <div class="rec-footer">
+        <span class="effort">Effort · Medium</span>
+        <span class="badge badge-success">Impact · Critical</span>
+      </div>
+    </div>
+    <div class="rec-card">
+      <span class="rec-num">R05 · High</span>
+      <h4 class="rec-title">Launch 5 topic cluster landing pages</h4>
+      <p class="rec-body"><code class="t-mono">/speaker-placement-for-tech-executives</code>, <code class="t-mono">/podcast-booking-for-saas-founders</code>, <code class="t-mono">/tedx-speaker-placement</code>, <code class="t-mono">/sxsw-speaker-program</code>, <code class="t-mono">/thought-leadership-for-fortune-500</code>. Each 1,500+ words, Article + FAQPage schema, internal linking to new case studies.</p>
+      <div class="rec-footer">
+        <span class="effort">Effort · Medium</span>
+        <span class="badge badge-success">Impact · Critical</span>
+      </div>
+    </div>
+    <div class="rec-card">
+      <span class="rec-num">R06 · High</span>
+      <h4 class="rec-title">Ship structured data sitewide</h4>
+      <p class="rec-body">Organization schema (10-year tenure, team, clients). Person schema for all 11 staff. Article schema on blog posts. Review schema on any client quotes. LocalBusiness schema for LA HQ. Takes 1–2 eng weeks; unlocks AI-engine parsing of authority signals.</p>
+      <div class="rec-footer">
+        <span class="effort">Effort · Low</span>
+        <span class="badge badge-success">Impact · High</span>
+      </div>
+    </div>
+    <div class="rec-card">
+      <span class="rec-num">R07 · High</span>
+      <h4 class="rec-title">Launch "Remix Reports" — quarterly research</h4>
+      <p class="rec-body">Original data is the single most citable asset class for AI engines. Publish a Q2 2026 drop: "State of the Tech Speaking Circuit" or "The 2026 Podcast Guest Benchmark". Free download, gated email capture. Pitch to trade press for coverage.</p>
+      <div class="rec-footer">
+        <span class="effort">Effort · High</span>
+        <span class="badge badge-success">Impact · Critical</span>
+      </div>
+    </div>
+    <div class="rec-card">
+      <span class="rec-num">R08 · Medium</span>
+      <h4 class="rec-title">Publish testimonials + awards page</h4>
+      <p class="rec-body">Remix has client quotes privately. Make them public with names, titles, and company logos. Create an awards/recognition page listing Forbes Agency Council, press mentions, conference speaker credits. AI engines cite named quotes heavily.</p>
+      <div class="rec-footer">
+        <span class="effort">Effort · Low</span>
+        <span class="badge badge-success">Impact · Medium</span>
+      </div>
+    </div>
+    <div class="rec-card">
+      <span class="rec-num">R09 · Medium</span>
+      <h4 class="rec-title">Publish pricing tiers (even rough ranges)</h4>
+      <p class="rec-body">Expert Bookers and Interview Connections both show tiered monthly ranges publicly. It captures intent-matched searches ("speaker agency pricing", "podcast booking cost") and reduces sales friction. Even "Programs start at $X/month" copy outperforms opaque "Contact us".</p>
+      <div class="rec-footer">
+        <span class="effort">Effort · Low</span>
+        <span class="badge badge-moderate">Impact · Medium</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header mt-32">
+    <span class="section-num">08c</span>
+    <span class="section-line"></span>
+    <span class="section-label">Phase 3 · Pursue Authority (90–180 days)</span>
+  </div>
+
+  <div class="grid-3">
+    <div class="rec-card">
+      <span class="rec-num">R10 · High</span>
+      <h4 class="rec-title">Launch the {{COMPANY_NAME}} podcast</h4>
+      <p class="rec-body">Katy Boos interviewing her own roster: Adobe execs, Meta comms leads, Oracle VPs, past TEDx speakers. Target 20 episodes in year one. A podcast is the single best long-lived AEO asset — every episode becomes indexable transcript, Spotify/Apple SEO, and a source AI engines cite.</p>
+      <div class="rec-footer">
+        <span class="effort">Effort · High</span>
+        <span class="badge badge-success">Impact · Critical</span>
+      </div>
+    </div>
+    <div class="rec-card">
+      <span class="rec-num">R11 · High</span>
+      <h4 class="rec-title">Book Katy Boos on 12+ industry podcasts</h4>
+      <p class="rec-body">Eat your own dog food. Target: agency management podcasts (AMI, Sell With Authority), PR industry shows, marketing strategy shows. Each appearance creates a citation node that AI engines crawl. Katy is a natural spokesperson and already a Forbes Agency Council member.</p>
+      <div class="rec-footer">
+        <span class="effort">Effort · Medium</span>
+        <span class="badge badge-success">Impact · High</span>
+      </div>
+    </div>
+    <div class="rec-card">
+      <span class="rec-num">R12 · Medium</span>
+      <h4 class="rec-title">Build alternative / comparison pages</h4>
+      <p class="rec-body"><code class="t-mono">/alternatives/interview-connections</code>, <code class="t-mono">/vs/kitcaster</code>, <code class="t-mono">/vs/bigspeak</code>. Captures high-intent comparison searches — buyers in the shortlist phase. Also forces the Remix differentiation story into fixed published language.</p>
+      <div class="rec-footer">
+        <span class="effort">Effort · Low</span>
+        <span class="badge badge-success">Impact · High</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header mt-32">
+    <span class="section-num">08d</span>
+    <span class="section-line"></span>
+    <span class="section-label">Phase 4 · Close The Moat (180d+)</span>
+  </div>
+
+  <div class="grid-3">
+    <div class="rec-card">
+      <span class="rec-num">R13 · Strategic</span>
+      <h4 class="rec-title">Certified Executive Speaker Program</h4>
+      <p class="rec-body">Nicki Pogue, Joanne Mathews, Whitney Greer are already in-house coaches. Package their methodology as a <em>Certified Speaker Coach</em> credential that clients (or their comms teams) can earn. Creates a training revenue line AND becomes a citable body of work.</p>
+      <div class="rec-footer">
+        <span class="effort">Effort · High</span>
+        <span class="badge badge-moderate">Impact · Medium</span>
+      </div>
+    </div>
+    <div class="rec-card">
+      <span class="rec-num">R14 · Strategic</span>
+      <h4 class="rec-title">Publish the "Remix Index" annually</h4>
+      <p class="rec-body">Data-driven ranking of the top 50 executive speakers of the year based on event placements, audience reach, and content resonance. Positions Remix as a <em>rater</em>, not just a placement shop — the classic Bloomberg/Forbes move. AI engines disproportionately cite ranked lists as source material.</p>
+      <div class="rec-footer">
+        <span class="effort">Effort · High</span>
+        <span class="badge badge-success">Impact · Critical</span>
+      </div>
+    </div>
+    <div class="rec-card">
+      <span class="rec-num">R15 · Option</span>
+      <h4 class="rec-title">Evaluate acquisition / merger</h4>
+      <p class="rec-body">Kitcaster's acquisition by Moburst (April 2025) fundamentally re-weighted the category. Remix may be acquired for its client portfolio, OR Remix may absorb a smaller pure-play podcast agency to cross-sell. Either route creates immediate scale in AEO firepower without a 12-month content flywheel.</p>
+      <div class="rec-footer">
+        <span class="effort">Effort · Strategic</span>
+        <span class="badge badge-moderate">Impact · Variable</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ 09 COST OF INACTION ═══════════════════════════════════════════════ -->
+<section class="page-break">
+  <div class="section-header">
+    <span class="section-num">[09]</span>
+    <span class="section-line"></span>
+    <span class="section-label">Cost Of Inaction · What Happens If Nothing Ships</span>
+  </div>
+
+  <div class="grid-3">
+    <div class="dark-card">
+      <div class="dark-eyebrow">Today · Apr 2026</div>
+      <div class="dark-value" style="font-size: 56px; letter-spacing: -0.05em; margin-top: 14px;">8<span style="font-size:18px; color: rgba(244,237,225,0.40); margin-left:4px;">/100</span></div>
+      <div class="dark-label mt-8">AEO Index</div>
+      <div class="dark-divider"></div>
+      <div class="dark-muted" style="font-size: 12px; line-height: 1.65;">
+        Remix is effectively invisible to category discovery queries. Brand-name search works. Every buyer using AI to shortlist vendors ends up with a list that excludes Remix.
+      </div>
+    </div>
+    <div class="dark-card">
+      <div class="dark-eyebrow">+6 months</div>
+      <div class="dark-value" style="font-size: 56px; letter-spacing: -0.05em; margin-top: 14px;">5<span style="font-size:18px; color: rgba(244,237,225,0.40); margin-left:4px;">/100</span></div>
+      <div class="dark-label mt-8">Projected</div>
+      <div class="dark-divider"></div>
+      <div class="dark-muted" style="font-size: 12px; line-height: 1.65;">
+        Kitcaster/Moburst ships 6 months of integrated content. New 2026 H2 listicles are written — all citing the current graph. Remix's relative position declines even though absolute output is flat.
+      </div>
+    </div>
+    <div class="dark-card">
+      <div class="dark-eyebrow">+12 months</div>
+      <div class="dark-value" style="font-size: 56px; letter-spacing: -0.05em; margin-top: 14px;">3<span style="font-size:18px; color: rgba(244,237,225,0.40); margin-left:4px;">/100</span></div>
+      <div class="dark-label mt-8">Projected</div>
+      <div class="dark-divider"></div>
+      <div class="dark-muted" style="font-size: 12px; line-height: 1.65;">
+        2027 listicles re-index against the existing winners. AI engines retrain against a year of further-entrenched signal. Cost to break in rises from ~8 weeks of editor outreach to ~6 months of structured PR.
+      </div>
+    </div>
+  </div>
+
+  <div class="narrative mt-24">
+    <span class="brief-kicker">◉ The Conversation To Have</span>
+    Remix is not losing because the product is weak. Adobe, Meta, Apple, and Oracle chose them on merit. The problem is that the buyer's first step is no longer a Google query with a blue-link SERP — it is a natural-language question to ChatGPT or Claude, and the answer is generated from a citation graph that Remix does not participate in. <strong>The work of the next 90 days is entirely about putting Remix into that graph.</strong> None of the 15 recommendations in Section 08 require a single new hire. Six of them are zero-engineering. Three of them are zero-dollar. What they require is a decision to treat AEO as an infrastructure investment rather than a content project — and a partner who can do the weekly measurement to prove the curve is bending. That is exactly the conversation Visibl exists to open.
+  </div>
+
+  <div class="insight">
+    <span class="eyebrow">◉ The Pitch In One Paragraph</span>
+    <strong>Every month Remix stays silent, a competitor gets closer to owning the "best thought leadership agency for tech executives" answer on every AI engine on earth — and Remix's premium client work (Adobe, Meta, Apple) stays buried as unindexable video.</strong> Visibl measures this gap weekly, shows you who's catching up fastest, and gives your team the exact content and citation plays that move the AEO index. We already ran the diagnostic. The next step is to turn it into a tracked remediation program.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ FOOTER / METHODOLOGY ═══════════════════════════════════════════════ -->
+<section>
+  <div class="section-header">
+    <span class="section-num">[10]</span>
+    <span class="section-line"></span>
+    <span class="section-label">Methodology &amp; Data Sources</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="eyebrow mb-12">◉ How this report was produced</div>
+      <div style="font-size: 13px; color: var(--ink-2); line-height: 1.7;">
+        This diagnostic was produced by the <strong>Visibl AEO + SEO pipeline</strong>, which is the same pipeline Visibl runs continuously for active clients. It combines: <br/><br/>
+        <span class="label" style="display: block; margin-bottom: 4px;">▸ Live Query Testing</span>
+        24 discovery prompts ran across ChatGPT, Perplexity, Claude, Gemini, and Google AI Overview, scored on appearance / citation / sentiment / position.<br/><br/>
+        <span class="label" style="display: block; margin-bottom: 4px;">▸ Listicle Authority Graph</span>
+        8 high-authority 2025–2026 "best agency" listicles crawled for inclusion + position.<br/><br/>
+        <span class="label" style="display: block; margin-bottom: 4px;">▸ Public SEO Signal Audit</span>
+        robots.txt, sitemap.xml, structured data, content cadence, case-study depth, pricing transparency, topic cluster presence.<br/><br/>
+        <span class="label" style="display: block; margin-bottom: 4px;">▸ Competitor Intelligence</span>
+        6 direct competitors profiled on the same 11 dimensions as the target.
+      </div>
+    </div>
+
+    <div class="dark-card">
+      <div class="dark-eyebrow">◉ Coverage Numbers</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
+        <div>
+          <div class="dark-label">Live queries run</div>
+          <div class="dark-value" style="font-size: 32px; margin-top: 4px;">24</div>
+        </div>
+        <div>
+          <div class="dark-label">AI engines tested</div>
+          <div class="dark-value" style="font-size: 32px; margin-top: 4px;">5</div>
+        </div>
+        <div>
+          <div class="dark-label">Listicles crawled</div>
+          <div class="dark-value" style="font-size: 32px; margin-top: 4px;">8</div>
+        </div>
+        <div>
+          <div class="dark-label">Competitors profiled</div>
+          <div class="dark-value" style="font-size: 32px; margin-top: 4px;">6</div>
+        </div>
+        <div>
+          <div class="dark-label">Remix URLs audited</div>
+          <div class="dark-value" style="font-size: 32px; margin-top: 4px;">51</div>
+        </div>
+        <div>
+          <div class="dark-label">SEO signals scored</div>
+          <div class="dark-value" style="font-size: 32px; margin-top: 4px;">24</div>
+        </div>
+      </div>
+      <div class="dark-divider"></div>
+      <div class="dark-muted" style="font-size: 11px; line-height: 1.6;">
+        Some signals (authenticated GSC / GA4 data, exact server-side schema detection, Search Console traffic and CTR) are unavailable without Remix granting pipeline access. A full Visibl integration would enrich this diagnostic with real organic traffic, intent-matched keyword loss, and rank-tracking against each of the 8 listicle terms.
+      </div>
+    </div>
+  </div>
+
+  <div class="report-footer">
+    <div class="left">Visibl · AEO + SEO Visibility Diagnostic · {{COMPANY_NAME}}</div>
+    <div>Prepared 15 Apr 2026 · Confidential</div>
+  </div>
+</section>
+
+</div>
+</body>
+</html>

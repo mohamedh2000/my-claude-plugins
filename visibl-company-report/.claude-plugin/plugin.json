@@ -1,0 +1,7 @@
+{
+  "name": "visibl-company-report",
+  "version": "1.0.0",
+  "description": "Generate a Visibl-branded AEO/SEO diagnostic report for any target company — HTML + PDF.",
+  "author": { "name": "mohamedh" },
+  "license": "MIT"
+}

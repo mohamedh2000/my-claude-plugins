@@ -40,6 +40,11 @@
       "name": "test-creator-agent",
       "description": "Automated test generation agent that analyzes repo test patterns, captures real data via browser automation, and generates comprehensive tests",
       "source": "./test-creator-agent"
+    },
+    {
+      "name": "visibl-company-report",
+      "description": "Generate a Visibl-branded AEO/SEO diagnostic report for any target company — HTML + PDF",
+      "source": "./visibl-company-report"
     }
   ]
 }

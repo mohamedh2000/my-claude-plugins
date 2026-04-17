@@ -1,0 +1,138 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   VISIBL PAPER/INK DESIGN TOKENS · Reference
+   ═══════════════════════════════════════════════════════════════════════════
+
+   These tokens are ALREADY EMBEDDED in templates/report.html inside a <style>
+   block. This file exists as a documented reference when the skill (or a human)
+   needs to look up a value or swap in a new palette version.
+
+   SOURCE OF TRUTH: ~/visibl-v2-google-analytics/.claude/design-system/design-system.md
+   If the Visibl design system evolves, regenerate this file AND update the
+   corresponding :root block in report.html.
+
+   LAW: never introduce colors not declared here. Never use gradient mesh,
+   violet/indigo accents with Inter, or dark-mode-by-default. The palette is
+   deliberately restrained — ink on paper, with the orange accent used
+   sparingly for emphasis and platform colors for engine-specific signal.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ───── Ink scale (text + borders on paper) ───── */
+  --ink:         #111111;   /* primary text, headings, bar fills */
+  --ink-2:       #444444;   /* secondary text */
+  --ink-3:       #555555;   /* tertiary text, section labels */
+  --ink-4:       #666666;   /* muted captions */
+  --ink-5:       #888888;   /* faintest ink, section numbers */
+  --border:      #E5E5E2;   /* card borders, chart track background */
+  --border-sub:  #EEEEEB;   /* subtler borders for nested cards */
+
+  /* ───── Status semantics (used sparingly, high-contrast only) ───── */
+  --green:       #2DA44E;
+  --green-l:     #DAFBE1;
+  --red:         #CF222E;
+  --red-l:       #FFEBE9;
+  --amber:       #BF8700;
+  --amber-l:     #FFF8C5;
+  --blue:        #0969DA;
+  --blue-l:      #DDF4FF;
+  --purple:      #8250DF;
+  --purple-l:    #EDDEFF;
+
+  /* ───── Visibl accent ───── */
+  --orange:      #FF4F00;   /* the one Visibl brand color — use sparingly */
+  --orange-l:    #FFF1E5;   /* backgrounds, highlight washes */
+
+  /* ───── Answer-engine platform colors (TEXT ONLY, never bar fills) ───── */
+  --chatgpt:     #10A37F;
+  --perplexity:  #20808D;
+  --gemini:      #4285F4;
+  --claude:      #D97706;
+
+  /* ───── Paper accents (cover, dark-card contrast text) ───── */
+  --cream:       #F4EDE1;
+  --cream-edge:  #EFE2C7;
+
+  /* ───── Shape ───── */
+  --radius:      14px;
+  --radius-sm:   8px;
+
+  /* ───── Type ───── */
+  --font-sans:   'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:   'JetBrains Mono', 'Courier New', monospace;
+
+  /* ───── Elevation ───── */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.03);
+  --shadow-md: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06), 0 12px 28px rgba(0,0,0,0.04);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Print setup — letter, tight margins, section-aware page breaks
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@page {
+  size: letter;
+  margin: 0.4in 0.35in;
+}
+
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .no-print { display: none !important; }
+  section { page-break-inside: avoid; }
+  .page-break { page-break-before: always; }
+  .avoid-break { page-break-inside: avoid; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Core type / layout shell
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #FFFFFF;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.shell {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+/* Section header pattern:   [01] ─────────────── SECTION LABEL ─────────────── */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 56px 0 20px;
+}
+.section-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--ink-5);
+  letter-spacing: 0.12em;
+}
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}

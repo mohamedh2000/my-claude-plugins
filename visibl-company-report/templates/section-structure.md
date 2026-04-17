@@ -55,16 +55,19 @@ This report is client-facing — an AE hands it to the prospect. Every page outs
 
 ---
 
-## [03] Target Company Snapshot
+## [03] How AI Identifies You
 
-**Purpose:** Ground the rest of the audit in who the target is and what category AI buyers compare them against. This is a Visibl-native section (not in the reference's 12-page structure).
+**Purpose:** Show what large language models already know about the target — the positioning they echo back, the proof they can cite, and the name-collisions that dilute their signal. Reframing away from "corporate snapshot" and toward "what AI sees when it reaches for your brand".
 
 **Required elements:**
-- Eyebrow: "Target Company"
-- H1: "Who {{COMPANY_NAME}} is and the category we are judging"
-- Positioning one-liner pulled verbatim from homepage hero
-- 3-stat row: Founded (year + HQ), Named Clients (count), Disambiguation Risk (count of same-named entities)
+- Eyebrow: "How AI Identifies You"
+- H1: "What AI engines already know about {{COMPANY_NAME}}"
+- Positioning one-liner pulled verbatim from the homepage hero (label it "Positioning AI repeats")
+- 2-stat row: Named Proof AI Can Cite (count of public logos/case-studies/press), Disambiguation Risk (count of same-named entities)
 - Right rail: 4 findings (Product, Customer, Proof, Recent Motion)
+
+**What NOT to include:**
+- Founding year, HQ city, employee count, funding history — none of that shapes AI retrieval. Keep the page focused on identity signals AI actually uses.
 
 **Voice:**
 - Only cite facts verifiable on the public site.
@@ -227,15 +230,20 @@ This report is client-facing — an AE hands it to the prospect. Every page outs
 
 ## [14] Progress Snapshot · Let's Keep Building (final page)
 
-**Purpose:** Closing CTA + audit scope summary. Contact email, two headline scores, "Keep Building →" button, and a compact scope-of-audit strip (what was tested — NO query list).
+**Purpose:** Closing note. Contact email + one headline health score + the forward-looking framing. This is a PDF deliverable so nothing clickable, nothing that duplicates data already shown earlier in the report.
 
 **Required elements:**
 - Eyebrow: "Progress Snapshot"
 - Hero-size title: "Let's keep building." with "building." in orange
 - Subtitle: one-paragraph forward-looking framing
-- Filled orange "Keep Building →" CTA
-- Right rail: 2 big-number rows (Current Health Score, Current AI Mentions) — NO "Projected Visibility Increase" — then "Get In Touch" with hello@bordlabs.ai and the prepared-for byline
+- Right rail: 1 big-number row (Current Health Score only) + "Get In Touch" block with hello@bordlabs.ai and the prepared-for byline
+
+**What NOT to include:**
+- No "Keep Building →" button or any other button — the deliverable is a PDF and buttons don't function.
+- No "Current AI Mentions" stat — already shown in the Executive Summary scorecard.
+- No "Scope of this audit" strip — duplicates data shown elsewhere and adds no new insight for the client.
+- No "Projected Visibility Increase" — projections are not claimed anywhere in the report.
 
 **Voice:**
 - Forward-looking, collaborative. Not a hard sell.
-- Scope summary on the left column (below CTA button): 3-stat row (N Category Queries · 4 Answer Engines · {{COMPANY_DOMAIN}}) + verticals-audited chip row. Up to 4 chips. NEVER include the verbatim query list — that is internal.
+- Short. The page is mostly whitespace by design — a quiet closing beat after 13 data-dense pages.

@@ -34,9 +34,9 @@
        DESIGN TOKENS — Good Culture / visibl by Bord Labs
        ═══════════════════════════════════════════════════════════════════════ */
     :root {
-      --paper:        #F7F5F1;
-      --paper-edge:   #EFEDE8;
-      --dot:          #E0DDD6;
+      --paper:        #F4F3EF;
+      --paper-edge:   #ECEAE5;
+      --dot:          #DDDBD5;
 
       --ink:          #1A1A1A;
       --ink-2:        #444444;
@@ -102,6 +102,12 @@
         break-after: page;
         break-inside: avoid;
         margin: 0;
+      }
+      /* Must override the adjacent-sibling rule below — its specificity (0,2,0)
+         beats plain .page (0,1,0), so in print the 32px top-margin sneaks back
+         in and pushes each page into a blank overflow page. */
+      .page + .page {
+        margin-top: 0;
       }
       .page:last-child {
         page-break-after: auto;
@@ -841,6 +847,11 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 32px;
     }
+    .stat-row-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 48px;
+    }
   </style>
 </head>
 <body>
@@ -995,7 +1006,7 @@
 </section>
 
 <!-- ═══════════════════════════════════════════════════════════════════════
-     03 · TARGET COMPANY SNAPSHOT
+     03 · HOW AI IDENTIFIES YOU
      ═══════════════════════════════════════════════════════════════════════ -->
 <section class="page">
   <div class="page-header">
@@ -1006,41 +1017,36 @@
         <div class="wordmark-sub">by Bord Labs</div>
       </div>
     </div>
-    <div class="page-section">Target Company</div>
+    <div class="page-section">How AI Identifies You</div>
   </div>
 
   <div class="page-body split-5-5">
     <div>
-      <div class="eyebrow">Target Company</div>
-      <h1 class="h1">Who {{COMPANY_NAME}} is and the <strong>category we are judging</strong>.</h1>
-      <p class="subtitle">Grounding the rest of the audit: positioning, proof, and the real category where AI buyers compare options.</p>
+      <div class="eyebrow">How AI Identifies You</div>
+      <h1 class="h1">What AI engines <strong>already know</strong> about {{COMPANY_NAME}}.</h1>
+      <p class="subtitle">Before we judge visibility, we capture what large language models see when they reach for your brand — the positioning they echo, the proof they cite, and the names that get confused with yours.</p>
 
       <div class="mt-40">
-        <div class="label">Positioning</div>
+        <div class="label">Positioning AI repeats</div>
         <div class="h2 mt-8"><!-- RENDER: exact hero headline from the company's rendered homepage, verbatim. --></div>
       </div>
 
-      <div class="stat-row-3 mt-40">
+      <div class="stat-row-2 mt-40">
         <div>
-          <div class="label">Founded</div>
-          <div class="big-stat mt-8">Year</div>
-          <!-- RENDER: HQ city + size signal (employees on LinkedIn, etc.) --><div class="footnote mt-8"></div>
-        </div>
-        <div>
-          <div class="label">Named Clients</div>
+          <div class="label">Named Proof AI Can Cite</div>
           <div class="big-stat green mt-8">N+</div>
-          <div class="footnote mt-8">Verified on site with logos or case studies</div>
+          <div class="footnote mt-8">Named clients, case studies, or press mentions surfaced publicly on the site</div>
         </div>
         <div>
           <div class="label">Disambiguation Risk</div>
           <div class="big-stat red mt-8">N entities</div>
-          <div class="footnote mt-8">Other brands sharing the name that dilute SERPs</div>
+          <div class="footnote mt-8">Other brands sharing the name that dilute the signal AI returns for your query</div>
         </div>
       </div>
     </div>
 
     <div class="findings">
-      <div class="findings-head">Company Profile</div>
+      <div class="findings-head">Identity Profile</div>
 
       <div class="finding">
         <div class="finding-badge accent">Product</div>
@@ -1846,38 +1852,6 @@
       <div class="eyebrow mt-16">Progress Snapshot</div>
       <h1 class="hero" style="font-size: 68px; line-height: 1.02;">Let's keep<br/><span class="accent">building.</span></h1>
       <p class="subtitle" style="max-width: 540px;">{{COMPANY_NAME}} has the foundation to lead category AI conversations. With targeted content, schema markup, and competitive positioning, that foundation becomes a pipeline engine. Here's how we get there together.</p>
-
-      <div class="mt-32">
-        <a href="#" class="cta-pill filled">Keep Building →</a>
-      </div>
-
-      <!-- Scope of audit — merged from former page 14 left side. Query list is intentionally NOT shown here; that detail is internal. -->
-      <div style="margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--border-sub);">
-        <div class="label">Scope of this audit</div>
-        <div class="stat-row-3 mt-16">
-          <div>
-            <div class="small-stat green">4</div>
-            <div class="label mt-8">Category Queries</div>
-          </div>
-          <div>
-            <div class="small-stat green">4</div>
-            <div class="label mt-8">Answer Engines</div>
-          </div>
-          <div>
-            <div class="small-stat green">{{COMPANY_DOMAIN}}</div>
-            <div class="label mt-8">Primary Domain</div>
-          </div>
-        </div>
-        <div class="path-chips mt-24">
-          <!-- RENDER: emit 1 .chip.done per vertical actually audited (cap at 4 per scope rules).
-               Examples: "Main catalog ✓", "Academy ✓", "Wholesale ✓", "Install guides ✓".
-               Keep text short — a chip grid, not a descriptive list. -->
-          <div class="chip done">Main catalog ✓</div>
-          <div class="chip done">Academy ✓</div>
-          <div class="chip done">Wholesale ✓</div>
-          <div class="chip done">Blog ✓</div>
-        </div>
-      </div>
     </div>
 
     <div class="flex-col" style="justify-content: space-between; height: 100%;">
@@ -1886,12 +1860,6 @@
           <div class="snapshot-val green">39/100</div>
           <div>
             <div class="label">Current Health Score</div>
-          </div>
-        </div>
-        <div class="snapshot-row">
-          <div class="snapshot-val green">7</div>
-          <div>
-            <div class="label">Current AI Mentions</div>
           </div>
         </div>
       </div>

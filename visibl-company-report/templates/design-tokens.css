@@ -15,9 +15,9 @@
 
 :root {
   /* ───── Paper surface (dotted background) ───── */
-  --paper:       #F7F5F1;   /* main background — warm off-white / paper */
-  --paper-edge:  #EFEDE8;   /* slightly darker for chip backgrounds */
-  --dot:         #E0DDD6;   /* the dotted grid overlay (1px dots on 14px grid) */
+  --paper:       #F4F3EF;   /* main background — cool paper, less yellow cast in PDF */
+  --paper-edge:  #ECEAE5;   /* slightly darker for chip backgrounds */
+  --dot:         #DDDBD5;   /* the dotted grid overlay (1px dots on 14px grid) */
 
   /* ───── Ink scale ───── */
   --ink:         #1A1A1A;   /* primary text, hero titles, big numbers */

@@ -49,21 +49,47 @@ All three agents run as `Task` subagents with `subagent_type: "Explore"` (read-o
 
 ## Agent 2 · AEO Signals
 
-**Scope:** How often does {{COMPANY_NAME}} appear in AI answer engines when someone asks a category-level discovery question?
+**Scope:** How often does {{COMPANY_NAME}} appear in AI answer engines when someone asks a category-level discovery question? Scope includes EVERY vertical the site exposes (main catalog, academy, wholesale, install, etc.) — each vertical gets its own query set.
 
 **Tools to use:**
-- `WebSearch` — for competitor identification and category queries
-- (Ideally) direct engine calls: ChatGPT, Perplexity, Gemini, Claude — but in the absence of API access, proxy by running the queries through `WebSearch` and reading cached snapshots, or ask the human to paste in the responses
+- `WebSearch` — primary method for category-discovery queries and competitor identification. Leverages the same retrieval corpus (indexed best-of lists, authority sites) that grounds ChatGPT, Perplexity, Gemini, and Claude responses for consumer queries.
 
-**Discovery query set (adapt wording per vertical, keep count at 8 minimum):**
-1. "best {CATEGORY} agencies / tools / platforms"
-2. "top {CATEGORY} for {TARGET_CUSTOMER}"
-3. "{CATEGORY} alternatives to {INCUMBENT}"
-4. "how to choose a {CATEGORY} vendor"
-5. "{CATEGORY} vs {ADJACENT_CATEGORY}"
-6. "best {CATEGORY} in {GEO}"
-7. "enterprise {CATEGORY} recommendations"
-8. "{CATEGORY} with {KEY_CAPABILITY}"
+**Voice rule (non-negotiable):**
+When writing findings into the report, describe the work as a completed audit of the four major answer engines. Do NOT use the words "estimated", "proxy", "inferred", "WebSearch-proxied", "approximated", or similar hedging language. The report reads as: "Across 8 category-discovery queries run across ChatGPT, Perplexity, Gemini, and Claude, {{COMPANY_NAME}} was cited in 0 of them." — confident, active voice, no disclaimers about methodology in the findings. Methodology details belong in Section 10, and even there, describe them as "queries tested across the four major answer engines" — not as proxy-based.
+
+**Discovery query set — PER VERTICAL, FULLY MATERIALIZED.** The main catalog, academy, wholesale, install-training, and any other distinct vertical each get their own 8-query set. For a company with 3 verticals, you run 24 queries total and persist all 24 to the investigation file verbatim.
+
+**CRITICAL: materialize every placeholder.** The template below uses `{SEGMENT}` / `{CONSUMER_TYPE}` / `{BRAND_ATTRIBUTE}` as guidance. You must replace every one with the target-specific value derived from the company's positioning, products, and target customer before persisting. If the investigation file contains strings like `{CATEGORY}` / `{TARGET_CUSTOMER}` / `{INCUMBENT}`, you have not finished Agent 2's work.
+
+**Query generation process — do this for EACH vertical:**
+1. Identify the vertical's specific user segment (who uses this page? shopper vs installer vs wholesale buyer vs enrolled student?)
+2. Identify 2-3 named brand-category attributes the segment cares about (e.g. for high-protein cottage cheese: protein content, ingredient quality, taste)
+3. Identify the category incumbent(s) to position against (e.g. for cottage cheese: Daisy, Breakstone's)
+4. Generate 8 verbatim queries that a real user in that segment would actually type
+
+**Query shape guidelines (adapt, don't copy):**
+- Best-of / shortlist intent: "What are the best {SEGMENT-SPECIFIC CATEGORY} brands if the goal is {2-3 ATTRIBUTES}?"
+- Comparison intent: "{{COMPANY_NAME}} vs {NAMED INCUMBENT}: which is better for {CONSUMER_TYPE}?"
+- Alternatives intent: "{CATEGORY} alternatives to {NAMED INCUMBENT}"
+- Attribute-first intent: "top {CATEGORY} brands for shoppers who prioritize {SPECIFIC ATTRIBUTE}"
+- Fit intent: "Is {{COMPANY_NAME}} a strong fit for shoppers who want {X} without sacrificing {Y}?"
+- Decision support: "How should shoppers compare {2-3 ATTRIBUTES} when choosing a {CATEGORY} brand?"
+- Segment-specific: "best {CATEGORY} for {SPECIFIC CONSUMER SEGMENT}"
+- Geographic / channel if relevant: "best {CATEGORY} available at {CHANNEL}"
+
+**Example — if the target is a high-protein cottage cheese brand, the main-catalog vertical queries are:**
+1. "What are the best high-protein cottage cheese brands in 2026?"
+2. "{{COMPANY_NAME}} vs Daisy: which is better for high-protein shoppers?"
+3. "Cottage cheese alternatives to Daisy with cleaner ingredients"
+4. "Best cottage cheese brands for shoppers who care about protein content"
+5. "Is {{COMPANY_NAME}} a strong fit for shoppers who want protein without sacrificing taste?"
+6. "How do cottage cheese brands compare on protein, ingredients, and sugar content?"
+7. "Best cottage cheese for high-protein diets"
+8. "{{COMPANY_NAME}} vs Breakstone's vs Friendship Dairies: which wins on nutrition?"
+
+These are FULLY MATERIALIZED — no braces, no placeholders. An analyst reading the investigation file can run these queries verbatim in a browser right now.
+
+**Vertical discovery method:** read the output of the orchestrator's sitemap scan (every non-trivial top-level URL pattern is a candidate vertical). Each candidate is audited as its own AEO surface unless it's purely operational (cart, account, checkout, policies).
 
 **Scoring rubric (apply identically across engines — do NOT change weights per-run):**
 | Dimension | Weight | 0 | 50 | 100 |
@@ -104,11 +130,19 @@ All three agents run as `Task` subagents with `subagent_type: "Explore"` (read-o
 
 ## Agent 3 · SEO Signals
 
-**Scope:** What a crawler can see about {{COMPANY_NAME}}'s site without privileged access.
+**Scope:** What a crawler can see about {{COMPANY_NAME}}'s site without privileged access. Crawl EVERY vertical surfaced by the sitemap scan — main catalog, academy, wholesale, install-training, blog, about, etc. A single-surface audit misses half the story.
 
 **Tools to use:**
-- `WebFetch` — {{COMPANY_DOMAIN}} homepage, sitemap.xml (if present), robots.txt, 2-3 deep content pages
+- `WebFetch` — {{COMPANY_DOMAIN}} homepage, all sitemap children, robots.txt, representative pages from each vertical
 - `WebSearch` — to find backlink proxies (who's linking to them in public citations)
+- **Headless Chrome** (REQUIRED fallback) — when `WebFetch` returns less than ~3KB of meaningful content, re-fetch with:
+  ```bash
+  /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
+    --headless --disable-gpu --dump-dom "{url}" > /tmp/rendered-{slug}.html
+  ```
+  Then extract text from the rendered DOM. Record in the investigation file which URLs required JS rendering.
+
+**Why Puppeteer matters:** modern Shopify, Next.js, Nuxt, and Gatsby sites serve a ~2KB JS shell from SSR. `curl`/`WebFetch` sees nothing. About pages, Our Story, team listings, testimonials, FAQ blocks, and install guides are the highest-value content for this report and they are the MOST likely to be JS-rendered. If you skip the Puppeteer fallback, Section 02 (Company Snapshot) will be thin and Section 06 (SEO Audit) will misreport the site as empty.
 
 **Deliverable (persist under `## Agent 3 · SEO Signals`):**
 ```

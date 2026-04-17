@@ -40,12 +40,52 @@ Output: a self-contained HTML file (browser-native) and a PDF sibling, both writ
 
 ## Hard rules (non-negotiable)
 
-1. **Never fabricate data.** If research comes up thin, surface the gap in Section 10 (Methodology). A report with honest gaps is stronger than a report with invented numbers.
-2. **Never change the section structure.** 10 sections, in order, every time. See `templates/section-structure.md`.
-3. **Never change the design tokens.** The :root block in `templates/report.html` IS the Visibl Paper/Ink identity. Don't introduce new colors, fonts, or card types. If you think a new component is needed, the answer is: use an existing one.
-4. **Brand-name queries don't count.** "What is {{company}}" returning {{company}} is not AEO signal. The scorecard tracks category-discovery queries only.
-5. **Cite every named data point.** In the investigation files, every fact traces back to a source URL. If you can't cite it, drop it.
-6. **All findings go on disk first.** Research agents persist to `~/.claude/investigations/visibl-report-{slug}.md` before the render step reads them. No research kept only in context.
+1. **The rendered report is a CLIENT-FACING pitch, not an internal audit.** This report is sent by an AE directly to the prospect. Voice rules (see "Voice: soft pitch" below) apply to pages 1-13 and 15. Page 14 (Methodology) keeps a neutral/analytical tone as a credibility anchor.
+
+2. **Platform jargon is BANNED in rendered prose.** Never write the name of the target's CMS, storefront, framework, or hosting platform anywhere in a visible page. No "Shopify", "WordPress", "Webflow", "Wix", "Squarespace", "Next.js", "Nuxt", "Gatsby", "BigCommerce", "Magento", "WooCommerce", "PrestaShop", "Contentful", "Sanity", "Strapi". No internal-research jargon either: no "SSR", "client-rendered", "crawl posture", "schema posture", "audit posture", "Puppeteer", "headless Chrome", "JSON-LD" (use "schema markup" instead). Investigation-file notes can use these terms; the rendered report cannot. See the full blocklist in the post-render leak scan.
+
+3. **The template is STRUCTURE ONLY. 100% of prose, numbers, queries, and findings in the final report MUST be generated from the investigation file — NOT copy-pasted from the template.** The Good Culture prose baked into `templates/report.html` is layout scaffolding to show you what shape each page takes. It is NOT a fallback to leave in place. A render that outputs the phrase "One-line hero statement from the company's homepage, verbatim" or a query containing `{CATEGORY}` / `{TARGET_CUSTOMER}` / `{INCUMBENT}` is a BUG — those are template guidance markers, not content. Replace every such marker with real, target-specific content sourced from research.
+
+4. **Queries are vertical-specific and verbatim.** The 8 sample queries on page 14 must be the ACTUAL queries each research agent ran for the target company, tailored per vertical. If the site has a main catalog + academy + wholesale, you show 3 groups of queries labeled by vertical. No `{VERTICAL_CATEGORY}` placeholders. No generic "best X brands" filler.
+
+5. **Never fabricate data.** If research came up thin on a specific data point, drop it or say so honestly in the Methodology section. A report with honest gaps is stronger than a report with invented numbers.
+
+6. **Never change the page structure.** 15 pages, in order, every time. See `templates/section-structure.md`.
+
+7. **Never change the design tokens.** The :root block in `templates/report.html` IS the Visibl Good-Culture identity. Don't introduce new colors, fonts, or card types. No dark cards. No gradient backgrounds. No violet/indigo. If you think a new component is needed, the answer is: use an existing one.
+
+8. **Brand-name queries don't count.** "What is {{company}}" returning {{company}} is not AEO signal. The scorecard tracks category-discovery queries only.
+
+9. **Cite every named data point.** In the investigation files, every fact traces back to a source URL. If you can't cite it, drop it.
+
+10. **All findings go on disk first.** Research agents persist to `~/.claude/investigations/visibl-report-{slug}.md` before the render step reads them. No research kept only in context.
+
+---
+
+## Voice: soft pitch (pages 1-13 + 15)
+
+The report is a conversation with the prospect. Not a lab report. Five rules, applied to every page outside page 14:
+
+1. **Address the reader as "you" / "your brand" / "your site".** Never refer to the target company in third person in body copy (headlines can use the company name for positioning; findings must switch to "you").
+2. **Frame findings as opportunities, not deficiencies.** "Schema is one of the quickest ways to unlock AI readability" beats "Missing Core Entity Markup: CRITICAL GAP."
+3. **Every page ends on an implication.** The last finding or paragraph hints at what to do about it, without explicitly naming Visibl (the sell is implicit). Visibl is named only on the Cover, Path Forward (page 12), and CTA (page 15).
+4. **Numbers stay blunt; language around them softens.** "0 of 8 category queries cited your brand" is fine. Wrap it with "This is the biggest single opportunity on the page — and the one that moves the visibility score fastest."
+5. **Emphasis words in `<strong>` are phrased as insights, not alerts.** "…but AI engines don't know it exists yet" not "…CRITICAL VISIBILITY GAP."
+
+**Page 14 exception:** the Methodology page stays neutral and analytical — it's the credibility anchor. Active voice, completed-work framing, no hedging, but ALSO no second-person "you" addressing. Example methodology line: "Ran 8 category queries across ChatGPT, Perplexity, Gemini, and Claude on 16 April 2026." — not "We ran queries to see where your brand shows up."
+
+**Platform-agnostic rewrite examples (apply these patterns every time):**
+| Jargon-y (banned) | Soft-pitch (use instead) |
+|---|---|
+| "clean Shopify stack" | "clean site architecture" |
+| "Shopify storefront with ~1,080 product URLs" | "~1,080 product pages indexed" |
+| "Clean Shopify-default crawl posture" | "Your site is well-configured for search — sitemaps are published, your robots file welcomes AI crawlers" |
+| "Organization (Shopify default)" | "Organization" |
+| "Shopify-default entity blocks likely present" | "Baseline identity markup is present" |
+| "sitemap.xml fans out to …" | "Your sitemap covers …" |
+| "WebFetch returned <3KB, Puppeteer-rendered via headless Chrome" | (do not mention at all in rendered prose) |
+| "JSON-LD" | "schema markup" |
+| "SSR / client-rendered" | (do not mention at all in rendered prose) |
 
 ---
 
@@ -53,22 +93,31 @@ Output: a self-contained HTML file (browser-native) and a PDF sibling, both writ
 
 ### Phase 0 · Brief
 
-Invoke `AskUserQuestion` with 2-3 grouped questions:
+**Default behavior: run autonomously.** Do NOT ask clarifying questions when the user provides a URL or company name. This skill must work end-to-end without human interaction because it will eventually be called by a background worker (Chrome extension → SQS queue → headless runner) where there is no human to answer prompts. Asking questions when you already have what you need is a bug, not caution.
 
-1. **Target** (required inputs):
-   - Company name (e.g. "Notion Labs")
-   - Company URL (e.g. "notion.so")
-2. **Strategic angle** (AEO-heavy / SEO-heavy / balanced — default: balanced)
-3. **Page depth** (concise 10-12pp / full 16-20pp — default: full)
-4. **Optional**: AE name for byline, known competitors to include
+**ONLY ask a question if:**
+- No URL or company name was provided AT ALL (the one and only required input). In that case, ask a single question for the URL. Nothing else.
 
-Derive:
-- `{{COMPANY_NAME}}` — user's full input, title-cased
-- `{{COMPANY_NAME_COVER}}` — for the cover page, split with `<br/>` at a natural break (e.g. "Notion<br/>Labs", or `{{COMPANY_NAME}}` alone if one word)
-- `{{COMPANY_DOMAIN}}` — bare domain, no scheme (e.g. "notion.so")
-- `{{COMPANY_SLUG}}` — lowercase, hyphenated, for filenames (e.g. "notion-labs")
-- `{{REPORT_DATE}}` — today, formatted `DD Month YYYY` (e.g. "16 April 2026")
-- `{{AE_NAME}}` — blank-string if not provided (skill renders "Visibl Team" as fallback)
+**Everything else uses defaults — derive, never prompt:**
+
+| Input | Default (use unless user explicitly overrode in their invocation) |
+|---|---|
+| Strategic angle | Balanced (equal AEO + SEO weight) |
+| Page depth | Full (15 pages, Good-Culture taxonomy) |
+| AE name | "Visibl Team" |
+| Competitor set | Auto-derive during Agent 2 research (do not pre-seed) |
+| Report date | Today, formatted as the template expects (`MON DD, YYYY` for the cover snapshot eyebrow, `DD Month YYYY` for byline) |
+| Accent word | "Visibility" (for hero title). Swap to "AI", "Citation", "Answer", or "Search" only if the category strongly demands it. |
+
+**Only re-ask if the user themselves explicitly said something like "ask me about X first" in their invocation.** Otherwise: defaults are law.
+
+**Derive these values from the URL/name input without asking:**
+- `{{COMPANY_NAME}}` — from URL (`auravinyl.com` → "Aura Vinyl") or explicit name input. Title-case.
+- `{{COMPANY_NAME_ACCENT}}` — the ONE word rendered in orange in the cover hero (e.g. "Visibility" in "Good Culture Visibility Review"). Stays as a separate token in the template so you can swap it thematically without hand-editing HTML.
+- `{{COMPANY_DOMAIN}}` — strip scheme + www (e.g. "https://www.auravinyl.com/" → "auravinyl.com").
+- `{{COMPANY_SLUG}}` — lowercase, hyphenated (e.g. "aura-vinyl").
+- `{{REPORT_DATE}}` — today. Cover snapshot uses `MAR 20, 2026` format; byline on page 15 uses `16 April 2026` format. Same date, two formats.
+- `{{AE_NAME}}` — "Visibl Team" fallback.
 
 ### Phase 1 · Research (3 parallel agents)
 
@@ -86,6 +135,20 @@ Each agent gets:
 - The investigation file path to persist to: `~/.claude/investigations/visibl-report-{{COMPANY_SLUG}}.md`
 - Mandatory `## Status` section updated as the agent works
 
+**Vertical-aware scoping — this is critical.** Before the three research agents spawn, the orchestrator MUST:
+1. Fetch `{{COMPANY_DOMAIN}}/sitemap.xml` (and any child sitemap indices it points to)
+2. Parse out the distinct top-level verticals the site exposes (examples: `/academy`, `/wholesale`, `/install-guides`, `/support`, `/blogs`, `/pages/our-story`, `/collections/*`, `/products/*`)
+3. Identify each non-trivial vertical as a **separate audit surface** — an Academy page selling install training has different category queries than the main product catalog
+4. Pass the full vertical list to all three research agents so they scope their work across every surface, not just the homepage
+
+Agent 2 (AEO Signals) generates **vertical-specific query sets**: the main catalog gets "best car wrap brands" queries, the academy gets "best vinyl wrap training" queries, the wholesale vertical gets "wholesale wrap film distributors" queries. A single-vertical query set leaves half the business invisible.
+
+Agent 3 (SEO Signals) MUST use **Puppeteer/headless Chrome** when a content page returns less than ~3KB of HTML (typical Shopify / Next.js JS shell). The `curl` or `WebFetch` tool alone misses content that's client-rendered. The fallback sequence:
+1. First try `WebFetch`
+2. If response body is <3KB OR lacks expected content markers, spawn headless Chrome: `/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --headless --disable-gpu --dump-dom "{url}" > /tmp/rendered.html`
+3. Extract text from rendered HTML
+4. Record which URLs required JS rendering in the investigation file
+
 **Wait for all 3 agents to return** before proceeding. Do NOT start rendering with partial data.
 
 **Research gate (hard stop):** Before Phase 2, read the investigation file. Verify:
@@ -97,48 +160,125 @@ If the gate fails → report to the user which agent came back thin and ask whet
 
 ### Phase 2 · Render HTML
 
-1. Read `templates/report.html` — the structural template. Don't paraphrase from memory; read it each time.
-2. Read `templates/section-structure.md` — the contract for what each section must contain.
+1. Read `templates/report.html` — the structural template. Read it each time; don't paraphrase from memory. **Treat every piece of prose in the template as example/placeholder content that MUST be replaced.** The Good Culture copy is there to show you what shape each page takes — it is not fallback content.
+2. Read `templates/section-structure.md` — the contract for what each page must contain, including the data-source requirements.
 3. Read `templates/design-tokens.css` — the color and type system. These values are already embedded in `report.html`; this file is a reference.
+4. Read the full investigation file at `~/.claude/investigations/visibl-report-{{COMPANY_SLUG}}.md` BEFORE starting to write. All page content must trace to findings there.
+
+**Pre-render gate — MUST pass all of these before writing any HTML:**
+
+| Check | How to verify |
+|---|---|
+| Sitemap scan produced a vertical list | Investigation file has an explicit `## Verticals` section with 2+ URL patterns |
+| Agent 2 generated per-vertical query sets | For each vertical, investigation file has 8 real queries (no `{CATEGORY}` / `{TARGET_CUSTOMER}` placeholders) |
+| Per-vertical citation counts exist | Each vertical has a result block showing which of its 8 queries got cited vs which didn't |
+| Schema audit has per-type results | Investigation file lists each schema type (Organization/WebSite/FAQPage/Service/Review/CollectionPage) as Present or Not Detected, with a cited source line (SSR HTML or Puppeteer-rendered) |
+| Competitor set is named | At least 4 real competitor names with cited visibility numbers — no "Competitor A/B/C" placeholders in the final report |
+| Sitemap metrics are concrete | Indexed Sitemaps count, Internal Links, H1 Headings, Homepage Size — all actual numbers from fetched data |
+
+If ANY of these fails → pause the render, report which check failed, and ask the user to re-run the agent or accept degraded output. Do NOT proceed with placeholder prose.
 
 **Rendering process:**
 - Copy the template to the output path (see Phase 4 for location)
 - Substitute the 5 literal placeholders in-place:
   - `{{COMPANY_NAME}}` → e.g. "Notion Labs"
-  - `{{COMPANY_NAME_COVER}}` → e.g. "Notion<br/>Labs"
+  - `{{COMPANY_NAME_ACCENT}}` → e.g. "Visibility" (the one word rendered in orange in the cover hero)
   - `{{COMPANY_DOMAIN}}` → e.g. "notion.so"
-  - `{{REPORT_DATE}}` → e.g. "16 April 2026"
+  - `{{REPORT_DATE}}` → e.g. "16 April 2026" (cover snapshot uses `MAR 20, 2026` shortform)
   - `{{AE_NAME}}` → e.g. "Sarah Chen" or "Visibl Team"
-- **Rewrite every section body** using the investigation file's findings:
-  - Keep the section chrome (`[NN]` header, card classes, grid layouts) intact
-  - Replace Remix-specific prose with the target company's researched content
-  - Keep the tone: confident, direct, specific numbers, no hedging in the executive summary
+- **Rewrite every page body** using the investigation file's findings:
+  - Keep the page chrome (wordmark, section name, eyebrows, footer with page number) intact
+  - Keep the layout primitives (`.split-5-5`, `.bar-row`, `.schema-row`, `.comp-grid`, etc.) intact
+  - Replace example prose with the target company's researched content
+  - Keep the tone: confident, declarative, specific numbers, no hedging anywhere
   - Every statistic must be traceable to the investigation file — if you're about to write a number, confirm you pulled it from there first
-- Preserve dark cards as section visual anchors — don't add new ones, don't remove existing ones
+- Do NOT introduce new components (dark cards, new card grids, new color accents). The Good-Culture aesthetic is intentionally restrained — all uniformly light on dotted cream, orange only for eyebrows/accent words/CTAs, green/amber/red only for metric values on bar rows.
 
-**Section-by-section check (before you write each section):**
-- Section 01 — at least 3 dark-card callouts with numerical proof
-- Section 03 — the weighted AEO Index shows its math
-- Section 04 — the citation-graph table names real sources
-- Section 05 — 4-6 real competitor cards, not hypotheticals
-- Section 07 — dimension table has a concrete P0/P1/P2 priority column
-- Section 08 — 4 phases, each with 3-5 recommendation cards with active-verb titles
-- Section 09 — max 3 scenarios, each with a dated horizon + named competitor
-- Section 10 — data gaps listed honestly
+**Page-by-page data source check — each page names its required research inputs:**
+
+| Page | Required data from investigation file | What to write |
+|---|---|---|
+| 01 Cover | Visibility Score (%), Health Score (/100), Indexed Sitemaps count, count of Missing Schema Types, category leader name | 4 snapshot stat rows — real numbers, not "63.7%" copied from template |
+| 02 Executive Summary | Visibility Score, Health Score, Buy Zone Placement %, Gap-vs-leader delta, 4-5 prioritized findings | One-sentence diagnosis specific to the target. The `<strong>` emphasis clause names the actual competitive context (e.g. "but still trails Daisy" not "but still trails the leader") |
+| 03 Company Snapshot | Positioning one-liner from Puppeteer-rendered homepage, founding year + HQ, named clients (real list, count), disambiguation entities | Write the actual positioning sentence from the site. Name real clients if public. |
+| 04 Sitemap & Discoverability | Actual sitemap.xml parse (indexed count, URL count), internal-link count, H1 count, homepage size KB, category-leader sitemap figures | 4 bar rows with REAL numbers. The "Top Competitor" finding names the real competitor and their real sitemap count. |
+| 05 Schema | Per-schema-type findings from SSR + Puppeteer scan (Organization/WebSite/FAQPage/Service/Review/CollectionPage) | Green bar ONLY for schema types actually detected. Grey "Not Detected" for missing. Don't invent Present/Missing status. |
+| 06 Content Depth | Total page count from sitemap, blog post count, service page count, avg word count (sampled). Competitor ranking data from Agent 2. | Named competitors in the ranking table. Real word counts. |
+| 07 AI Bot Access | Actual robots.txt contents + per-bot rule status (GPTBot, PerplexityBot, ClaudeBot, Google-Extended, CCBot, Bytespider) | Raw robots.txt line IS the footnote. Per-bot IMPLICIT/ALLOW/DENY is determined by parsing real directives. |
+| 08 Query Gap | **Vertical-specific query sets** — for each vertical the site exposes, show 8 real queries + which got cited vs lost. If the site has N verticals, this page shows N × 8 query slots total. | Queries are verbatim, specific to the target's actual segments (e.g. "best high-protein cottage cheese brands 2026" for Good Culture, not "best {CATEGORY} brands"). Winning/Lost labels come from actual cite results. |
+| 09 Citation Gap | Owned vs third-party vs competitor-owned citation counts from Agent 2's per-query results | Real cite counts on the bar rows. 3 findings (Current State / Recommended Fix / Competitive Signal) all reference concrete data. |
+| 10 Competitive Landscape | 4-6 real competitor names with their visibility scores + positioning + recent-moves | NO "Competitor A/B/C". Name each. Pull real taglines from their homepages or category listings. |
+| 11 Answer Gap | Specific page-type gaps identified in Agent 3 + Agent 2 (comparison pages missing, explainers missing, FAQ gaps, proof pages) | 4 recommendation cards. Each title is a specific page type (e.g. "Comparison Pages"). Each body explains WHY this target specifically needs it. |
+| 12 Path Forward | Current state (what audit confirmed), 30-day next-sprint items (from Answer Gap recommendations), 60-90d monitoring items | Chip labels describe target-specific actions (e.g. "FAQ pages for cottage cheese shoppers" not "FAQ / educational content") |
+| 13 Next Steps | Target-appropriate timeline derived from Path Forward + audit urgency signals | 4 timeline items with concrete week-level dates |
+| 14 Methodology | **The actual per-vertical query sets Agent 2 ran.** Actual count of URLs audited. List of verticals audited as chips. | NO placeholder queries. NO hedging words ("estimated", "inferred", "proxy", etc. — see section-structure.md voice rules). |
+| 15 CTA | Projected visibility increase (from Path Forward), current health score, current AI mentions count | "Let's keep building." stays. Accent word on "building" stays. Numbers on right rail are real. |
+
+**Post-render leak scan — BEFORE writing the file to disk, grep the rendered HTML for these anti-patterns. If any match, FIX them before writing:**
+
+```
+─── Placeholder leaks (template markers that weren't replaced) ───
+  {CATEGORY}             — unreplaced research-brief placeholder
+  {TARGET_CUSTOMER}      — ditto
+  {INCUMBENT}            — ditto
+  {ADJACENT_CATEGORY}    — ditto
+  {GEO}                  — ditto
+  {KEY_CAPABILITY}       — ditto
+  {YEAR}                 — use the actual year
+  {VERTICAL_CATEGORY}    — ditto
+  {SEGMENT}              — ditto
+  {CONSUMER_TYPE}        — ditto
+  {BRAND_ATTRIBUTE}      — ditto
+  COMPETITOR_NAME_1..5   — replace with the 5 real competitor names from Agent 2
+  COMPETITOR_NAME_       — any leftover marker means you forgot one
+  "RENDER:" (in visible output)  — HTML comment guidance text rendered accidentally
+  "An unanswered or under-owned AI query"                — old template filler
+  "Current strong query. ... ranks at position #2 here"  — old template filler
+  "Write the actual positioning sentence"                — template guidance leaked
+  "One-line hero statement from the company's homepage"  — template guidance leaked
+
+─── Platform-name leaks (CMS / storefront / framework) ───
+  Shopify, shopify, Shopify-default
+  WordPress, wordpress, WP, wp-admin
+  Webflow, webflow, webflow.io
+  Wix, wix.com
+  Squarespace, squarespace
+  Next\.js, NextJS, next\.js
+  Nuxt, nuxt\.js
+  Gatsby, gatsbyjs
+  BigCommerce, Magento, WooCommerce, PrestaShop
+  Contentful, Sanity(?!zed), Strapi       (word-bounded — avoid false-matches on "sanity")
+  Ghost CMS, Drupal, Joomla
+  \bReact\b, \bVue\b, \bAngular\b, \bSvelte\b      (word-bounded — these words are OK in prose that's NOT describing the site's stack, but the leak scan flags ALL occurrences and you manually confirm)
+
+─── Internal research jargon leaks ───
+  SSR, client-rendered, server-rendered
+  crawl posture, schema posture, audit posture
+  Puppeteer, headless Chrome, headless chrome
+  JSON-LD           (use "schema markup" in prose)
+  WebFetch, WebSearch    (tool names — internal)
+  sitemap\.xml fans out, fan-out
+  entity blocks likely present   (template leak phrase)
+```
+
+The leak scan is a `grep -E` run over the rendered HTML (content outside `<!-- -->` blocks). A single match means the render is incomplete — fix the offending passage and re-emit before saving to disk. HTML comments containing these terms are fine (they're guidance to future you).
+
+This leak scan is mandatory. Think of it as a compile step — no output ships with these strings present.
 
 ### Phase 3 · Render PDF
 
-Attempt Chrome headless print-to-PDF:
+Attempt Chrome headless print-to-PDF. The template uses a landscape widescreen page size (15in × 9.4in, defined in the embedded `@page` rule), so Chrome picks that up automatically — the command itself doesn't need a page-size flag.
 
 ```bash
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-OUT_HTML="$HOME/Desktop/{{COMPANY_NAME}}-Visibl-Report/{{COMPANY_SLUG}}-aeo-seo-gap-report.html"
+OUT_HTML="$HOME/Desktop/{{COMPANY_NAME}}-Visibl-Report/{{COMPANY_SLUG}}-visibility-report.html"
 OUT_PDF="${OUT_HTML%.html}.pdf"
 
 if [ -x "$CHROME" ]; then
   "$CHROME" \
     --headless --disable-gpu \
     --no-pdf-header-footer \
+    --print-to-pdf-no-header \
     --print-to-pdf="$OUT_PDF" \
     "file://$OUT_HTML"
 else
@@ -147,10 +287,11 @@ fi
 ```
 
 Acceptance:
-- PDF opens in Preview
-- Page breaks fall between sections (not mid-card)
-- Cream / ink / orange colors render correctly (no banding)
-- Letter size, 0.4in × 0.35in margins
+- PDF opens in Preview at the intended 15in × 9.4in landscape page size
+- Each of the 15 pages renders as ONE PDF page — no mid-page breaks
+- Dotted paper background renders on every page (no banding, no missing dots)
+- Accent orange, status greens/amber/red are color-faithful (matches the Good Culture reference)
+- No browser chrome / URL footer bleed into the PDF (enforced by `--no-pdf-header-footer`)
 
 If PDF fails for any reason → keep the HTML, report the failure, don't retry silently.
 
@@ -159,8 +300,8 @@ If PDF fails for any reason → keep the HTML, report the failure, don't retry s
 **Output directory:** `~/Desktop/{{COMPANY_NAME}}-Visibl-Report/`
 
 Files produced:
-- `{{COMPANY_SLUG}}-aeo-seo-gap-report.html`
-- `{{COMPANY_SLUG}}-aeo-seo-gap-report.pdf` (if Chrome available)
+- `{{COMPANY_SLUG}}-visibility-report.html`
+- `{{COMPANY_SLUG}}-visibility-report.pdf` (if Chrome available)
 
 After rendering:
 ```bash
@@ -171,10 +312,10 @@ open "$OUT_HTML"
 
 Chat reply is 4-6 lines max:
 - Company analyzed
-- 10 sections rendered
+- 15 pages rendered (Good-Culture taxonomy)
 - File paths (click to open)
-- Any research gaps flagged in Section 10
-- Invite them to review + ask for follow-ups
+- Accent word used on the cover (e.g. "Visibility")
+- Verticals audited (chips on page 14)
 
 ---
 

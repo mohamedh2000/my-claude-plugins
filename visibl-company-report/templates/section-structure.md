@@ -1,175 +1,259 @@
-# Report Section Structure
+# Report Section Structure (v2 · Good-Culture taxonomy)
 
-The Visibl company report has **10 fixed sections**. Keep the structure identical across every run — only prose and data points change. Section order is load-bearing: each builds on the previous.
+The Visibl AI Visibility Progress Report has **15 fixed pages**. The taxonomy is hybrid: it follows the platform's canonical AI Visibility Progress Report structure (Good Culture template) with two additional Visibl-native sections (Competitive Landscape · Methodology) inserted.
 
-Section numbering convention: `[NN]` for top-level sections (01–10), `08a`, `08b`, … for sub-phases inside the roadmap.
+Keep the page order identical across every run. Only prose and data points change. Page 1 is always the cover; page 15 is always the closing CTA.
 
 ---
 
-## [01] Executive Summary
+## Voice (applies to pages 1-13 + 15)
 
-**Purpose:** The one-page elevator pitch. If the AE only reads this page, they still walk into the meeting with the three sharpest facts.
+This report is client-facing — an AE hands it to the prospect. Every page outside page 14 follows a soft-pitch advisor voice:
+
+- Address the reader as **"you" / "your brand" / "your site"** in body copy
+- Frame findings as **opportunities**, not deficiencies
+- Every page ends on an **implication** — a sentence or line that hints at what to do about it, without naming Visibl (the sell is implicit; Visibl appears only on Cover, Path Forward page 12, and CTA page 15)
+- Keep **numbers blunt**; soften the language wrapped around them
+- **Never mention platform / CMS names** (Shopify, WordPress, Webflow, Next.js, Nuxt, Gatsby, WooCommerce, BigCommerce, Magento, etc.). Use "your site", "the storefront", or the schema type alone.
+- **Never use internal research jargon** — no "crawl posture", "SSR", "JSON-LD" (say "schema markup"), "Puppeteer", "WebFetch". These are audit-tooling words that don't belong in a client artifact.
+
+Page 14 (Methodology) is the credibility anchor — it stays neutral and analytical (active voice, completed-work framing, no "you" addressing).
+
+---
+
+## [01] Cover
+
+**Purpose:** Hero page that names the company, the report type, and the four highest-signal metrics at a glance.
 
 **Required elements:**
-- Hero statement (1 sentence) — the single most important finding
-- 3-4 "dark-card" callouts with numerical proof points (e.g. "Zero cites across 8 discovery prompts")
-- A closing strong-text paragraph that names what the company HAS (assets) + what it LACKS (citation infrastructure)
+- `eyebrow`: "AI Visibility Progress Report" in orange mono uppercase
+- `hero` title: "{{COMPANY_NAME}} {{COMPANY_NAME_ACCENT}} Review" — ONE word in orange (see accent rule below)
+- Subtitle: one-paragraph framing of the report's scope
+- "View scorecard →" CTA pill
+- Right rail: `SNAPSHOT · {{REPORT_DATE}}` with 4 stat rows (Visibility Score, Health Score, Indexed Sitemaps, Missing Schema Types). Each row: big colored number + metric name + one-line description
 
-**Rules:**
-- No hedging. The executive summary states findings flat-out; nuance goes in later sections.
-- Always include a concrete "share of citations" or "AEO index" number, even if estimated — cite the method.
+**Voice:**
+- No hedging. Numbers are numbers.
+- The accent word must be thematic: for Visibl's template the canonical choice is "Visibility" (as in "Good Culture Visibility Review"). Other fits: "AI", "Citation", "Answer", "Search".
 
 ---
 
-## [02] Target Company Snapshot
+## [02] Executive Summary · The Bottom Line
 
-**Purpose:** Who are they, what do they sell, who do they sell it to. Grounds the rest of the report.
+**Purpose:** One-sentence diagnosis of where the company stands, backed by the four most important numbers and the prioritized finding list. If the AE reads only this page, they still win the meeting.
 
 **Required elements:**
-- Positioning one-liner
-- Founding year + geography + size signal (employees / client count / revenue proxy)
-- Customer proof: named clients if public (logos / case studies), else "X+ clients in {category}"
-- Proof points from their own site: team size, years in market, notable press
-- What they are NOT: explicit disambiguation from similarly-named entities
+- Eyebrow: "The Bottom Line"
+- H1: one-sentence diagnosis with the final clause in `<strong>` for emphasis
+- Subtitle: 2-3 sentences of context
+- 2×2 stat grid: Visibility Score, Health Score, Buy Zone Placement, Gap vs Leader
+- Right rail: "Key Findings" — 4-5 findings, each with a colored badge (Priority orange / Verified green / Critical red / Context grey), title, and 1-2 line explanation
 
-**Rules:**
-- Only public information. If a data point can't be verified, drop it — never estimate.
-- Flag ambiguous company names (e.g. multiple "Remix" entities) since they dilute brand SERPs.
+**Voice:**
+- Diagnosis is declarative. No "may be", "could be", "appears to".
+- Numbers appear as clean percentages or fractions (no `~`, no "est.").
 
 ---
 
-## [03] Answer Engine Visibility Scorecard
+## [03] Target Company Snapshot
 
-**Purpose:** The AEO heart of the report. How often does {{COMPANY_NAME}} appear when an LLM answers a category question?
+**Purpose:** Ground the rest of the audit in who the target is and what category AI buyers compare them against. This is a Visibl-native section (not in the reference's 12-page structure).
 
 **Required elements:**
-- Weighted AEO Index (0-100 composite score) — single headline number on a dark card
-- Per-engine share (ChatGPT / Perplexity / Gemini / Claude) — 4-column grid using platform colors for labels only
-- Per-query transcript excerpts: 6-10 real queries tested, who got cited, where {{COMPANY_NAME}} ranked
-- Coverage map: out of N tested discovery queries, how many cited {{COMPANY_NAME}}
+- Eyebrow: "Target Company"
+- H1: "Who {{COMPANY_NAME}} is and the category we are judging"
+- Positioning one-liner pulled verbatim from homepage hero
+- 3-stat row: Founded (year + HQ), Named Clients (count), Disambiguation Risk (count of same-named entities)
+- Right rail: 4 findings (Product, Customer, Proof, Recent Motion)
 
-**Scoring rubric (lock this in):**
-- **Share of Voice**: percent of queries where cited (weight 40%)
-- **Citation Rank**: average position when cited, 1 = first (weight 30%)
-- **Completeness**: cited by name, with link, with attribution (weight 20%)
-- **Recency**: freshness of the cited source (weight 10%)
-
-**Rules:**
-- Always run the same set of category-level discovery queries across all 4 engines. Save the transcripts.
-- Distinguish brand-name queries ("what is {{COMPANY_NAME}}") from category queries ("best {{CATEGORY}} agencies"). Brand queries don't count toward the scorecard — they're table stakes.
+**Voice:**
+- Only cite facts verifiable on the public site.
+- Drop anything unverifiable — don't flag it in this section.
 
 ---
 
-## [04] The Citation Graph Gap
+## [04] Sitemap & Discoverability
 
-**Purpose:** Why does the AEO score look the way it does? Trace it back to the real-world sources AI engines cite.
+**Purpose:** Technical crawlability audit. Can AI engines find the site, and how deep does the crawlable footprint go?
 
 **Required elements:**
-- A table showing: listicle/article source → which competitors it cites → whether {{COMPANY_NAME}} is in it
-- A percentage gap stat: "X% of category citations go to {{COMPANY_NAME}} vs Y% category median"
-- Brief explainer: why listicles matter (AI engines re-index them every 6-12 months)
-- The moat math: cost of entry today vs cost of entry 12 months from now
+- Eyebrow: "Sitemap & Discoverability"
+- H1 emphasis phrase: "…needs more depth" or similar
+- 4 bar rows: Indexed Sitemaps, Internal Links, H1 Headings, Homepage Size. Each row has label, big colored value, and a thin horizontal progress bar.
+- Right rail: 4 findings (Current State, Interpretation, Top Competitor, Competitive Context)
 
-**Rules:**
-- Use named sources, not "some industry articles". If a source can't be named publicly, cite the proxy (e.g. "Clutch Top 10", "Gartner Peer Insights").
+**Voice:**
+- Never report a page as "empty" when Puppeteer wasn't used to render it. The fallback is mandatory.
 
 ---
 
-## [05] Competitive Landscape · Who's Winning
+## [05] Schema & Structured Data
 
-**Purpose:** Put faces to the competitors. Who specifically is eating {{COMPANY_NAME}}'s share?
+**Purpose:** Per-schema-type audit. Which entity schema blocks exist vs which are missing. Schema is "the fastest technical win" framing.
 
 **Required elements:**
-- 4-6 competitor cards in a grid. Each card:
-  - Competitor name + logo (if public)
-  - One-line positioning
-  - Why they're winning (content cadence, schema, partnerships, recent moves)
-  - Their AEO score vs {{COMPANY_NAME}}'s
-- A "moves of note" callout for recent events (acquisitions, fundraises, product launches within 6 months)
+- Eyebrow: "Schema & Structured Data"
+- H1: "AI engines still need more help understanding what {{COMPANY_NAME}} is"
+- Per-schema rows for: Organization, WebSite, FAQPage, Service, Review/Rating, CollectionPage. Each with a thin bar (green when Present, grey when Not Detected)
+- Right rail: 4 findings (Verified detected schema, Critical Gap missing markup, Competitor signal, Fast Technical Win framing)
 
-**Rules:**
-- Competitors must be real, named, and currently operating. Do not compose hypothetical competitors.
-- Flag any recent M&A — acquisitions shift the competitive weight immediately.
+**Voice:**
+- Schema absence detected via SSR HTML or Puppeteer render ONLY. Never claim absence based on an empty `curl` on a JS-rendered page.
 
 ---
 
-## [06] SEO Audit · Public Signal Analysis
+## [06] Content Depth
 
-**Purpose:** The public-signal SEO layer — what a crawler sees without any private GSC/GA data.
+**Purpose:** Compare the target's content footprint to category competitors. Who has the deepest body of owned, citable content?
 
 **Required elements:**
-- Homepage title + meta description evaluation
-- Schema markup present / absent (Organization, Service, FAQ, BreadcrumbList)
-- Site depth: number of indexable pages, depth of content, blog cadence
-- Backlink proxies (who's linking, anchor text patterns)
-- Performance + mobile signals (LCP, CLS, mobile-responsive)
+- Eyebrow: "Content Depth"
+- H1 emphasis: "…still thin" or "…already leading depth"
+- "Current Content Footprint" stat box: Total Pages, Blog Posts, Service Pages, Avg Words/Page
+- Right rail: "Competitive Ranking · Content Depth" — 5-6 competitor rows with bars and `38 / 449 avg words`-style labels
 
-**Rules:**
-- Only public signals. Never claim data from GSC / GA4 / Ahrefs / Semrush unless the AE has supplied it.
-- Flag in Section 10 if the audit was visual-only (no crawler access).
+**Voice:**
+- Numbers from sitemap counts, not guesses. If a sitemap is gated, say so in Methodology, don't report `0`.
 
 ---
 
-## [07] Gap Analysis · Dimension By Dimension
+## [07] AI Bot Access
 
-**Purpose:** The scorecard that ties AEO + SEO findings into a dimension-by-dimension comparison with competitors.
+**Purpose:** robots.txt audit — which AI crawlers (GPTBot, PerplexityBot, ClaudeBot, Google-Extended, CCBot, Bytespider) are explicitly allowed, denied, or implicit.
 
 **Required elements:**
-- A table: dimension | category leader | {{COMPANY_NAME}} today | gap | priority
-- 10-12 dimensions minimum (content cadence, schema coverage, podcast/media, case studies, comparison pages, etc.)
-- A summary line: "Across N dimensions, {{COMPANY_NAME}} is structurally behind on X and tied on Y."
+- Eyebrow: "AI Bot Access"
+- H1: "Crawlers can reach the site. Access is not the blocker." (or inverted if they ARE blocking)
+- 3-stat row: Explicit Bot Mentions, Sitemaps Listed, Global Crawl Rule
+- raw robots.txt excerpt as footnote (monospace)
+- Right rail: "Robots.txt Signals" table with 6 bot rows — bot name, rule, owner, IMPLICIT/ALLOW/DENY status
 
-**Rules:**
-- Priority column must be concrete (P0 / P1 / P2), not "high / medium / low".
-- "Tied" is a real status — don't force-rank everything as behind.
-
----
-
-## [08] Recommendations · 180-Day Roadmap
-
-**Purpose:** What do we do about it? Four phases, each with a tight list of actions.
-
-**Required elements — four phases, each its own sub-section:**
-- `[08a]` Phase 1 · Immediate (0-30 days) — quick wins, mostly technical (schema, comparison pages, proof content)
-- `[08b]` Phase 2 · Build AEO Assets (30-90 days) — editor outreach, original research, case study polish
-- `[08c]` Phase 3 · Pursue Authority (90-180 days) — owned media, awards, annual research launch
-- `[08d]` Phase 4 · Close The Moat (180d+) — certifications, category definitions, M&A routes
-
-Each phase contains 3-5 recommendation cards. Each card:
-- Title (active-voice verb)
-- Why it matters (1 sentence)
-- Concrete first step
-
-**Rules:**
-- Every recommendation must be executable by a 2-3 person marketing team within its stated window. No "hire a VP of content" type asks.
-- Include one M&A / acquisition note if the category is consolidating — it's a real option, not a footnote.
+**Voice:**
+- "No explicit rule" + `Allow: /` = IMPLICIT, not DENIED. Distinction matters.
 
 ---
 
-## [09] Cost Of Inaction
+## [08] Query Gap Analysis
 
-**Purpose:** The "if you do nothing" section. Hardest section to write honestly.
+**Purpose:** The AEO scorecard. Across N category-discovery queries, how often does the company appear and where does it rank?
 
 **Required elements:**
-- 2-3 scenarios with concrete time horizons (e.g. "Q3 2026: Kitcaster/Moburst ships 6 months of integrated content…")
-- Each scenario names a specific competitor + specific outcome, not "competitors will pull ahead"
+- Eyebrow: "Query Gap Analysis"
+- H1 emphasis: "…already in the prompt" or similar
+- 3-stat grid (full width): Queries Tracked (green), Top 3 Rankings (green), Gap Queries (red)
+- 2-column split: Lost Queries (red dots, 3 items) vs Winning Queries (green dots, 3 items). Each with query text + one-line meta.
 
-**Rules:**
-- No doom. The section establishes urgency through specific, named inevitabilities — not FUD.
-- Maximum 3 scenarios. More dilutes the punch.
+**Voice:**
+- Queries are verbatim strings, in quotes.
+- "Lost" = absent from top-3. "Winning" = top-3 or explicit cite.
 
 ---
 
-## [10] Methodology & Data Sources
+## [09] Citation Gap Analysis
 
-**Purpose:** How this report was assembled. Not an afterthought — it's the credibility layer.
+**Purpose:** Where do AI citations actually come from — the company's own site, third-party coverage, or competitor-owned sources?
 
 **Required elements:**
-- AEO queries tested: exact query text, engines run against, date run
-- Dark card with 3-4 stat tiles: URLs audited, competitors analyzed, queries tested, sources cited
-- Data gaps disclosure: what we DIDN'T have (no GSC access, no Ahrefs, no rank-tracker) — told straight
-- What a full Visibl integration would add (organic traffic, authenticated GSC, rank-tracking)
+- Eyebrow: "Citation Gap Analysis"
+- H1: "AI engines need more reasons to cite {{COMPANY_NAME}} directly"
+- Subtitle naming owned-citation percentage
+- 3 bar rows: {{COMPANY_DOMAIN}} (usually small), third-party coverage, competitor-owned sources
+- Right rail: 3 findings (Current State, Recommended Fix, Competitive Signal)
 
-**Rules:**
-- This is where research gaps live. If the skill couldn't verify something, it goes HERE, not inside an earlier section as a false claim.
-- Never fabricate data. If the research came up thin, say so — a report with honest gaps is stronger than a report with invented numbers.
+**Voice:**
+- "Owned" = appears as cited source on the company's domain. "Third-party" = any citing domain.
+
+---
+
+## [10] Competitive Landscape
+
+**Purpose:** Named competitor cards with their visibility scores. Who's eating the company's share? This is a Visibl-native section (not in the reference's 12-page structure).
+
+**Required elements:**
+- Eyebrow: "Competitive Landscape"
+- H1 emphasis: "…eating {{COMPANY_NAME}}'s citation share"
+- 3-column grid of 6 competitor cards (including {{COMPANY_NAME}} itself as one entry for direct comparison)
+- Each card: name, 1-line positioning, visibility % (colored green/amber/red by relative standing)
+
+**Voice:**
+- Competitors MUST be real, currently operating, and actually cited in the AEO data. No hypothetical competitors.
+- Recent M&A or funding within 6 months gets called out in the tagline.
+
+---
+
+## [11] Answer Gap Analysis
+
+**Purpose:** What types of pages does the site need to build to answer AI buyers' questions? The prescriptive follow-up to Citation Gap.
+
+**Required elements:**
+- Eyebrow: "Answer Gap Analysis"
+- H1 emphasis: "…directly answer what buyers and AI systems want to know"
+- 2×2 grid of recommendation cards. Each: rank label (01 — Critical / 02 — High Upside / 03 — High Upside / 04 — Strategic), title, 1-2 sentence description, timing chip (Do This Week / Week 2 / Week 2-3 / Strategic)
+
+**Voice:**
+- 4 cards is the target. Don't exceed.
+- Titles are nouns or noun phrases, not verbs ("Comparison Pages" not "Build Comparison Pages").
+
+---
+
+## [12] The Path Forward
+
+**Purpose:** Phased roadmap. What's done vs what's next vs what's ongoing.
+
+**Required elements:**
+- Eyebrow: "The Path Forward"
+- H1 with projected metric change ("63.7% → 72%+. Now make it durable.")
+- 3 path rows: Current Snapshot (Now), Next Sprint (30 Days), Monitoring (60-90 Days). Each row shows 4-5 chip pills.
+- "Done" chips use a green dot + muted ink text. Future chips use an orange dot + normal ink text.
+
+**Voice:**
+- Phase names are platform-consistent. Don't invent new phase labels.
+
+---
+
+## [13] Next Steps
+
+**Purpose:** Concrete suggested timeline that an AE can put in a proposal or SOW.
+
+**Required elements:**
+- Eyebrow: "Next Steps"
+- H1 emphasis: "…turns that into movement"
+- Right rail: "Suggested Timeline" with 4 timeline rows. Each: name, when (colored orange for this-quarter, green for next-quarter), and a filled progress track.
+
+**Voice:**
+- The timeline implicitly commits Visibl. Be conservative with dates.
+
+---
+
+## [14] Methodology & Data Sources
+
+**Purpose:** Credibility layer — exactly what was run, which engines were queried, which verticals were audited. Visibl-native section.
+
+**Required elements:**
+- Eyebrow: "Methodology & Data Sources"
+- H1: "How we ran this audit on {{COMPANY_NAME}}"
+- "What we ran" 3-stat row: Category Queries (count), Answer Engines (4), Primary Domain
+- "Verticals audited" chip row (Main catalog, Academy, Wholesale, Install guides, About, Blog — each with a ✓)
+- Right rail: "Sample Queries (Category-Discovery Set)" — 8 query rows with verbatim text and "Run across ChatGPT, Perplexity, Gemini, Claude on {{REPORT_DATE}}" meta
+
+**Voice rules (non-negotiable):**
+- Active voice only. Describe the methodology as completed work.
+- NEVER use: "estimated", "inferred", "proxy", "approximation", "WebSearch-proxied", "simulated", "extrapolated"
+- Describe engine coverage as: "Ran 8 category queries across ChatGPT, Perplexity, Gemini, and Claude on {{REPORT_DATE}}."
+
+---
+
+## [15] Progress Snapshot · Let's Keep Building
+
+**Purpose:** Closing CTA. Projected improvement + contact email + "Keep Building →" button.
+
+**Required elements:**
+- Eyebrow: "Progress Snapshot"
+- Hero-size title: "Let's keep building." with "building." in orange
+- Subtitle: one-paragraph forward-looking framing
+- Filled orange "Keep Building →" CTA
+- Right rail: 3 big-number rows (Projected Visibility Increase, Current Health Score, Current AI Mentions), then "Get In Touch" with hello@bordlabs.ai and the prepared-for byline
+
+**Voice:**
+- Forward-looking, collaborative. Not a hard sell.
+- Projected number must match the one used on page 12 (The Path Forward).

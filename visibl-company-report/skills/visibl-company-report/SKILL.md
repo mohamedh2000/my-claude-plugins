@@ -119,27 +119,49 @@ The report is a conversation with the prospect. Not a lab report. Five rules, ap
 - `{{REPORT_DATE}}` — today. Cover snapshot uses `MAR 20, 2026` format; byline on page 15 uses `16 April 2026` format. Same date, two formats.
 - `{{AE_NAME}}` — "Visibl Team" fallback.
 
-### Phase 1 · Research (3 parallel agents)
+### Phase 1 · Research (3 parallel agents · speed-tuned for ≤10 min total runtime)
 
 Read `templates/research-briefs.md` first — it contains the exact scope and deliverable shape for each agent.
 
+**HARD SCOPE LIMITS (non-negotiable — the target runtime is 10-12 min end-to-end):**
+
+| Constraint | Value |
+|---|---|
+| Max verticals audited | **4** (cap at 4 even if sitemap exposes more — pick the 4 most strategic by traffic/category importance) |
+| Queries per vertical | **4** (down from 8 — still enough for SoV scoring with acceptable variance) |
+| Competitors profiled | **3-4** (page 10 grid shows the 3-4 most cited; skip "emerging" tier to save time) |
+| Research agent model | **Haiku** (`model: claude-haiku-4-5` — ~3× faster than Sonnet/Opus for tool-use research, rate-limit-friendly) |
+| Render model | Sonnet/Opus (your default) — the 15-page render is where quality matters most |
+
+**Phase transition MILESTONE markers (print exactly as shown, on their own line):**
+The worker parses stdout for these strings to surface progress to the AE in Discord. Print them at the exact moments named:
+
+- `[[MILESTONE: research-started]]` — immediately after spawning the 3 research agents
+- `[[MILESTONE: research-done]]` — after the research gate passes (all 3 agents complete + investigation file verified)
+- `[[MILESTONE: render-started]]` — before starting HTML render (Phase 2)
+- `[[MILESTONE: render-done]]` — after HTML file is written to Desktop
+- `[[MILESTONE: pdf-done]]` — after Chrome print-to-PDF completes
+
+These must appear on their own line with nothing else, so the worker's regex matches cleanly. Don't explain or annotate them inline.
+
 Spawn three `Task` subagents in parallel (single message, three `Task` tool calls):
 
-- **Agent 1 · Company Profile** (`subagent_type: researcher`)
-- **Agent 2 · AEO Signals** (`subagent_type: researcher`)
-- **Agent 3 · SEO Signals** (`subagent_type: researcher`)
+- **Agent 1 · Company Profile** (`subagent_type: researcher`, model: haiku)
+- **Agent 2 · AEO Signals** (`subagent_type: researcher`, model: haiku)
+- **Agent 3 · SEO Signals** (`subagent_type: researcher`, model: haiku)
 
 Each agent gets:
 - The research brief text for its section
 - The target company name + URL
 - The investigation file path to persist to: `~/.claude/investigations/visibl-report-{{COMPANY_SLUG}}.md`
 - Mandatory `## Status` section updated as the agent works
+- The scope limits above (max 4 verticals, 4 queries per vertical, 3-4 competitors)
 
 **Vertical-aware scoping — this is critical.** Before the three research agents spawn, the orchestrator MUST:
 1. Fetch `{{COMPANY_DOMAIN}}/sitemap.xml` (and any child sitemap indices it points to)
-2. Parse out the distinct top-level verticals the site exposes (examples: `/academy`, `/wholesale`, `/install-guides`, `/support`, `/blogs`, `/pages/our-story`, `/collections/*`, `/products/*`)
-3. Identify each non-trivial vertical as a **separate audit surface** — an Academy page selling install training has different category queries than the main product catalog
-4. Pass the full vertical list to all three research agents so they scope their work across every surface, not just the homepage
+2. Parse out the distinct top-level verticals the site exposes
+3. **Cap the list at 4 verticals**, ranked by strategic importance (main product > comparison-value verticals like academy/wholesale > support/help > blog). Skip operational paths (cart, account, checkout, policies, legal)
+4. Pass the capped vertical list to all three research agents so they scope work to those 4 surfaces only
 
 Agent 2 (AEO Signals) generates **vertical-specific query sets**: the main catalog gets "best car wrap brands" queries, the academy gets "best vinyl wrap training" queries, the wholesale vertical gets "wholesale wrap film distributors" queries. A single-vertical query set leaves half the business invisible.
 

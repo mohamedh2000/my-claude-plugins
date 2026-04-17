@@ -57,7 +57,7 @@ All three agents run as `Task` subagents with `subagent_type: "Explore"` (read-o
 **Voice rule (non-negotiable):**
 When writing findings into the report, describe the work as a completed audit of the four major answer engines. Do NOT use the words "estimated", "proxy", "inferred", "WebSearch-proxied", "approximated", or similar hedging language. The report reads as: "Across 8 category-discovery queries run across ChatGPT, Perplexity, Gemini, and Claude, {{COMPANY_NAME}} was cited in 0 of them." — confident, active voice, no disclaimers about methodology in the findings. Methodology details belong in Section 10, and even there, describe them as "queries tested across the four major answer engines" — not as proxy-based.
 
-**Discovery query set — PER VERTICAL, FULLY MATERIALIZED.** The main catalog, academy, wholesale, install-training, and any other distinct vertical each get their own 8-query set. For a company with 3 verticals, you run 24 queries total and persist all 24 to the investigation file verbatim.
+**Discovery query set — PER VERTICAL, FULLY MATERIALIZED.** The main catalog + up to 3 additional distinct verticals each get their own **4-query set** (hard cap — the 10-min runtime target depends on it). For a company with 4 verticals, you run 16 queries total (not 32) and persist all 16 to the investigation file verbatim.
 
 **CRITICAL: materialize every placeholder.** The template below uses `{SEGMENT}` / `{CONSUMER_TYPE}` / `{BRAND_ATTRIBUTE}` as guidance. You must replace every one with the target-specific value derived from the company's positioning, products, and target customer before persisting. If the investigation file contains strings like `{CATEGORY}` / `{TARGET_CUSTOMER}` / `{INCUMBENT}`, you have not finished Agent 2's work.
 
@@ -67,7 +67,7 @@ When writing findings into the report, describe the work as a completed audit of
 3. Identify the category incumbent(s) to position against (e.g. for cottage cheese: Daisy, Breakstone's)
 4. Generate 8 verbatim queries that a real user in that segment would actually type
 
-**Query shape guidelines (adapt, don't copy):**
+**Query shape guidelines — pick 4 of these 8 patterns per vertical, skew toward the ones your research indicates are most active for this category:**
 - Best-of / shortlist intent: "What are the best {SEGMENT-SPECIFIC CATEGORY} brands if the goal is {2-3 ATTRIBUTES}?"
 - Comparison intent: "{{COMPANY_NAME}} vs {NAMED INCUMBENT}: which is better for {CONSUMER_TYPE}?"
 - Alternatives intent: "{CATEGORY} alternatives to {NAMED INCUMBENT}"
@@ -77,15 +77,13 @@ When writing findings into the report, describe the work as a completed audit of
 - Segment-specific: "best {CATEGORY} for {SPECIFIC CONSUMER SEGMENT}"
 - Geographic / channel if relevant: "best {CATEGORY} available at {CHANNEL}"
 
-**Example — if the target is a high-protein cottage cheese brand, the main-catalog vertical queries are:**
+**Example — if the target is a high-protein cottage cheese brand, the main-catalog vertical gets 4 queries (down from 8):**
 1. "What are the best high-protein cottage cheese brands in 2026?"
 2. "{{COMPANY_NAME}} vs Daisy: which is better for high-protein shoppers?"
 3. "Cottage cheese alternatives to Daisy with cleaner ingredients"
-4. "Best cottage cheese brands for shoppers who care about protein content"
-5. "Is {{COMPANY_NAME}} a strong fit for shoppers who want protein without sacrificing taste?"
-6. "How do cottage cheese brands compare on protein, ingredients, and sugar content?"
-7. "Best cottage cheese for high-protein diets"
-8. "{{COMPANY_NAME}} vs Breakstone's vs Friendship Dairies: which wins on nutrition?"
+4. "{{COMPANY_NAME}} vs Breakstone's vs Friendship Dairies: which wins on nutrition?"
+
+(Comparison-intent + shortlist-intent give the strongest AEO signal per query — prioritize those.)
 
 These are FULLY MATERIALIZED — no braces, no placeholders. An analyst reading the investigation file can run these queries verbatim in a browser right now.
 

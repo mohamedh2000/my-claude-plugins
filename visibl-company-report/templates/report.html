@@ -200,7 +200,12 @@
       padding: 44px 60px 48px;
       overflow: hidden;
     }
-    .page + .page { margin-top: 32px; }
+    /* Screen-only visual spacing between pages. In @media print this rule
+       doesn't apply so adjacent sections abut cleanly against the @page
+       boundary (no 32px overflow → no blank PDF pages). */
+    @media screen {
+      .page + .page { margin-top: 32px; }
+    }
 
     /* Page header (top bar: wordmark left, section name right) */
     .page-header {

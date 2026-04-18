@@ -223,21 +223,50 @@ If the gate fails → report to the user which agent came back thin and ask whet
 
 If ANY of these fails → pause the render, report which check failed, and ask the user to re-run the agent or accept degraded output. Do NOT proceed with placeholder prose.
 
-**Rendering process:**
-- Copy the template to the output path (see Phase 4 for location)
-- Substitute the 5 literal placeholders in-place:
-  - `{{COMPANY_NAME}}` → e.g. "Notion Labs"
-  - `{{COMPANY_NAME_ACCENT}}` → e.g. "Visibility" (the one word rendered in orange in the cover hero)
-  - `{{COMPANY_DOMAIN}}` → e.g. "notion.so"
-  - `{{REPORT_DATE}}` → e.g. "16 April 2026" (cover snapshot uses `MAR 20, 2026` shortform)
-  - `{{AE_NAME}}` → e.g. "Sarah Chen" or "Visibl Team"
-- **Rewrite every page body** using the investigation file's findings:
-  - Keep the page chrome (wordmark, section name, eyebrows, footer with page number) intact
-  - Keep the layout primitives (`.split-5-5`, `.bar-row`, `.schema-row`, `.comp-grid`, etc.) intact
-  - Replace example prose with the target company's researched content
-  - Keep the tone: confident, declarative, specific numbers, no hedging anywhere
-  - Every statistic must be traceable to the investigation file — if you're about to write a number, confirm you pulled it from there first
-- Do NOT introduce new components (dark cards, new card grids, new color accents). The Good-Culture aesthetic is intentionally restrained — all uniformly light on dotted cream, orange only for eyebrows/accent words/CTAs, green/amber/red only for metric values on bar rows.
+**Rendering process — deterministic template substitution (NOT raw HTML generation):**
+
+The template `templates/report.html` contains **19 `{{TOKEN}}` placeholders**: 5 global tokens (`COMPANY_NAME`, `COMPANY_NAME_ACCENT`, `COMPANY_DOMAIN`, `REPORT_DATE`, `AE_NAME`) and 14 `PAGE_N_BODY` tokens — one per page. The CSS block, page-header/page-footer chrome, @page rules, @media print rules, and mobile responsive block are all STATIC and do NOT change per company.
+
+Your job in Phase 2 is to produce a `values.json` file (NOT to write HTML directly). The json has the 19 keys listed above; each value is the content that slots into its placeholder:
+
+- `COMPANY_NAME`, `COMPANY_NAME_ACCENT`, `COMPANY_DOMAIN`, `REPORT_DATE`, `AE_NAME` — simple strings
+- `PAGE_1_BODY` through `PAGE_14_BODY` — HTML fragments for each page's body (the inner content of `<div class="page-body ...">`, everything between that opening div and its closing `</div>`)
+
+Each `PAGE_N_BODY` value is HTML you author using the primitives already defined in the template's CSS: `.eyebrow`, `.hero`, `.h1`, `.h2`, `.subtitle`, `.split-5-5`, `.findings`, `.finding`, `.finding-title`, `.finding-body`, `.finding-badge`, `.stat-grid-2`, `.stat-cell`, `.big-stat`, `.small-stat`, `.bar-row`, `.schema-row`, `.schema-bar-track`, `.schema-bar-fill`, `.comp-grid`, `.comp-row`, `.rec-grid-4`, `.chip`, `.path-chips`, `.timeline-row`, `.snapshot-row`, etc. Do NOT invent new classes. Do NOT inline CSS. Do NOT add `<style>` blocks — all styling is in the template.
+
+**Step-by-step:**
+
+1. Author `values.json` in the output directory. Structure:
+   ```json
+   {
+     "COMPANY_NAME": "Caraway Home",
+     "COMPANY_NAME_ACCENT": "Visibility",
+     "COMPANY_DOMAIN": "carawayhome.com",
+     "REPORT_DATE": "APR 18, 2026",
+     "AE_NAME": "Visibl Team",
+     "PAGE_1_BODY": "<div>\\n  <div class=\\"eyebrow\\">AI Visibility Progress Report</div>\\n  ...</div>",
+     "PAGE_2_BODY": "<div class=\\"split-5-5\\">\\n  <div>\\n    <div class=\\"eyebrow\\">The Bottom Line</div>\\n    <h1 class=\\"h1\\">You lead cookware — <strong>but the rest of your catalog is invisible</strong></h1>\\n    ...\\n  </div>\\n  <div class=\\"findings\\">...</div>\\n</div>",
+     ...
+   }
+   ```
+
+2. Invoke the renderer via Bash to substitute placeholders into the template and produce the final HTML:
+   ```bash
+   node /Users/husseinmohamed/my-claude-plugins/visibl-company-report/templates/render.mjs \
+     /Users/husseinmohamed/my-claude-plugins/visibl-company-report/templates/report.html \
+     {OUTPUT_DIR}/values.json \
+     {OUTPUT_DIR}/{slug}-visibility-report.html
+   ```
+   The renderer exits non-zero if any `{{TOKEN}}` is missing from `values.json` or if any placeholder remains unresolved after substitution. On failure, you MUST fix `values.json` and re-run — do NOT Write the HTML file directly as a workaround.
+
+3. Apply the Voice rules (soft pitch + Tension Rule) WHEN AUTHORING THE VALUES — not after render. Each `PAGE_N_BODY` HTML fragment should already be in soft-pitch voice before it goes into the JSON.
+
+**Why this matters:**
+- Render phase drops from ~10 min (generating 63 KB of HTML) to ~2 min (generating ~20 KB of JSON values).
+- The CSS scaffold stops drifting — fixes like the `@media print body margin reset` and the mobile responsive block are preserved by design because the LLM never touches CSS.
+- Placeholder coverage is enforced: the renderer verifies every token in the template has a matching value.
+
+Do NOT introduce new components in the `PAGE_N_BODY` fragments (dark cards, new card grids, new color accents). The Good-Culture aesthetic is intentionally restrained — all uniformly light on dotted cream, orange only for eyebrows/accent words/CTAs, green/amber/red only for metric values on bar rows.
 
 **Page-by-page data source check — each page names its required research inputs:**
 

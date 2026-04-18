@@ -60,6 +60,11 @@ Output: a self-contained HTML file (browser-native) and a PDF sibling, both writ
 
 10. **All findings go on disk first.** Research agents persist to `~/.claude/investigations/visibl-report-{slug}.md` before the render step reads them. No research kept only in context.
 
+11. **No clickable-looking elements anywhere in the report.** The deliverable is a static PDF + HTML share link — neither surface supports clicks on `<button>` or `<a class="cta-pill">` elements in a useful way. Do NOT include:
+    - `<a class="cta-pill">` or any button-shaped "View scorecard →" / "Keep Building →" / "Read full report →" element on the cover, path-forward, or CTA pages
+    - Any element styled as a pill, button, or link-with-arrow that implies the reader should click it
+    Instead, use quiet transitional copy styled as text — e.g. `<div class="eyebrow-muted">Let's deep dive below ↓</div>` or `<p class="footnote">Continue to the Executive Summary →</p>`. A cover page whose last visible element is a static sentence or eyebrow-muted line is correct; a cover page with an orange pill button is a bug.
+
 ---
 
 ## Voice: soft pitch (pages 1-13 + 14)

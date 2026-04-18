@@ -197,7 +197,13 @@
       background-image: radial-gradient(var(--dot) 1px, transparent 1px);
       background-size: 14px 14px;
       background-position: 0 0;
-      padding: 44px 60px 48px;
+      /* Bottom padding reserves ~96px of safe zone at the bottom of each page
+         so content cannot overlap the absolute-positioned .page-footer.
+         Previous 48px was cutting it close: when a page had a dense list of
+         query rows, the last row collided with the "Company · visibl by Bord
+         Labs" footer text. 96px = 32px footer-bottom + ~25px footer-height +
+         ~40px comfortable gap. */
+      padding: 44px 60px 96px;
       overflow: hidden;
     }
     /* Screen-only visual spacing between pages. In @media print this rule

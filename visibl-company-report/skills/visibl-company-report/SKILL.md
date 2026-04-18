@@ -71,6 +71,16 @@ The report is a conversation with the prospect. Not a lab report. Five rules, ap
 3. **Every page ends on an implication.** The last finding or paragraph hints at what to do about it, without explicitly naming Visibl (the sell is implicit). Visibl is named only on the Cover, Path Forward (page 12), and CTA (page 14).
 4. **Numbers stay blunt; language around them softens.** "0 of 8 category queries cited your brand" is fine. Wrap it with "This is the biggest single opportunity on the page — and the one that moves the visibility score fastest."
 5. **Emphasis words in `<strong>` are phrased as insights, not alerts.** "…but AI engines don't know it exists yet" not "…CRITICAL VISIBILITY GAP."
+6. **Tension Rule — name the vulnerability, don't hide it.** "Frame as opportunity" (rule 2) does NOT mean "say everything is fine." This report is sent to convince a prospect they need help. If the company is already doing well on some metric but weak on another, the job of the Executive Summary is to NAME that gap as a defensibility risk, not to celebrate the strength. The specific trigger:
+
+   **If Visibility Score ≥ 70% AND Health Score ≤ 65, the Executive Summary's lead finding MUST explicitly tie the two together and frame the lead as fragile.**
+
+   Template sentence shapes (pick one, adapt to the company):
+   - "Your brand is cited at {vis}% today — but that lead sits on a {health}/100 foundation. A competitor with {N} targeted schema additions could close the gap in {timeframe}."
+   - "The visibility is real; the defensibility isn't. {Specific-weakness} means the {vis}% citation share can be copied faster than it was earned."
+   - "{Company} leads today, but {specific gap} is what competitors will attack — and {specific gap} is the cheapest thing in AI marketing to fix."
+
+   Every page after the Exec Summary should echo this frame somewhere: the lead is real, the lead is vulnerable, here's what fixes it. A prospect reading this should close the PDF thinking "we need to move fast" — not "we're doing fine."
 
 **Page 14 exception:** the scope-of-audit strip embedded inside the CTA page stays neutral and analytical — it's the credibility anchor. Active voice, completed-work framing, no hedging, but ALSO no second-person "you" addressing. Example methodology line: "Ran 4 category queries across ChatGPT, Perplexity, Gemini, and Claude on 16 April 2026." — not "We ran queries to see where your brand shows up."
 
@@ -144,7 +154,15 @@ The worker parses stdout for these strings to surface progress to the AE in Disc
 
 These must appear on their own line with nothing else, so the worker's regex matches cleanly. Don't explain or annotate them inline.
 
-Spawn three `Task` subagents in parallel (single message, three `Task` tool calls):
+**TRUE-PARALLEL SPAWN — the single most important rule in Phase 1.**
+
+In a prior Caraway run, subagent finish times were 22:57 / 22:59 / 23:17 — staggered, not parallel. Research took 29 minutes instead of ~10. The fix is enforced by the mechanic below; if you deviate, research cost doubles.
+
+**Required mechanic:** after emitting `[[MILESTONE: research-started]]`, your very next assistant message MUST contain exactly **three `Task` tool_use blocks and nothing else between them**. No prose. No TodoWrite. No Read. No intermediate reasoning. Three Task calls, issued as one message. The Claude Code runtime will execute them concurrently only when they appear in the same message — any prose or non-Task tool call between them serializes the next Task.
+
+If you find yourself tempted to write "let me spawn Agent 1 first, then check its output" — stop. That pattern produces the 29-minute regression. All three agents must go out together; you aggregate only after all three return.
+
+Spawn:
 
 - **Agent 1 · Company Profile** (`subagent_type: researcher`, model: haiku)
 - **Agent 2 · AEO Signals** (`subagent_type: researcher`, model: haiku)
@@ -153,9 +171,14 @@ Spawn three `Task` subagents in parallel (single message, three `Task` tool call
 Each agent gets:
 - The research brief text for its section
 - The target company name + URL
-- The investigation file path to persist to: `~/.claude/investigations/visibl-report-{{COMPANY_SLUG}}.md`
-- Mandatory `## Status` section updated as the agent works
 - The scope limits above (max 4 verticals, 4 queries per vertical, 3-4 competitors)
+- Mandatory `## Status` section updated as the agent works
+- **Per-agent investigation file paths (separate files — avoids the `block-write-existing.sh` hook collision seen when all three wrote to the same file):**
+  - Agent 1 → `~/.claude/investigations/visibl-report-{{COMPANY_SLUG}}-company.md`
+  - Agent 2 → `~/.claude/investigations/visibl-report-{{COMPANY_SLUG}}-aeo.md`
+  - Agent 3 → `~/.claude/investigations/visibl-report-{{COMPANY_SLUG}}-seo.md`
+
+After all three return, the orchestrator concatenates the three files into the aggregate `~/.claude/investigations/visibl-report-{{COMPANY_SLUG}}.md` for the render phase to read.
 
 **Vertical-aware scoping — this is critical.** Before the three research agents spawn, the orchestrator MUST:
 1. Fetch `{{COMPANY_DOMAIN}}/sitemap.xml` (and any child sitemap indices it points to)

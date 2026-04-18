@@ -1,6 +1,12 @@
 # Research Briefs
 
-Three parallel research agents run during Phase 1 of the skill. Each agent has a tight scope, a deliverable shape, and a rule set. Output is persisted to `~/.claude/investigations/visibl-report-{company-slug}.md` so it survives compaction.
+Three parallel research agents run during Phase 1 of the skill. Each agent has a tight scope, a deliverable shape, and a rule set. To avoid file-lock collisions (we saw `block-write-existing.sh` fire when all three wrote to one file), each agent writes to its OWN investigation file; the orchestrator merges them at the end of Phase 1.
+
+- Agent 1 → `~/.claude/investigations/visibl-report-{company-slug}-company.md`
+- Agent 2 → `~/.claude/investigations/visibl-report-{company-slug}-aeo.md`
+- Agent 3 → `~/.claude/investigations/visibl-report-{company-slug}-seo.md`
+
+After all three return, the orchestrator concatenates them into the aggregate `~/.claude/investigations/visibl-report-{company-slug}.md` that the render phase reads.
 
 All three agents run as `Task` subagents with `subagent_type: "Explore"` (read-only, fast) or `"researcher"` (read/write, persists findings). Prefer `researcher` since we need findings on disk.
 

@@ -52,26 +52,32 @@ This report is client-facing — an AE hands it to the prospect. Every page outs
 **Voice:**
 - Diagnosis is declarative. No "may be", "could be", "appears to".
 - Numbers appear as clean percentages or fractions (no `~`, no "est.").
+- **Lead on vulnerability, not victory.** If Visibility ≥ 70% AND Health ≤ 65, the H1 and the first finding MUST explicitly tie the two numbers and frame the lead as fragile. See SKILL.md "Tension Rule" for exact sentence patterns.
+- Sample H1 when tension applies: "Your brand is cited at 81% today — but <strong>that lead sits on a 55/100 foundation competitors can copy</strong>."
+- Sample first finding title: "Visibility Dominance Built on Thin Schema — Easy to Replicate" (not "Category Leader in AI Citations").
+- NEVER use H1 phrases like "already winning", "locking in the lead", "dominant". Those signals close the sale; they don't open it.
 
 ---
 
 ## [03] How AI Identifies You
 
-**Purpose:** Show what large language models already know about the target — the positioning they echo back, the proof they can cite, and the name-collisions that dilute their signal. Reframing away from "corporate snapshot" and toward "what AI sees when it reaches for your brand".
+**Purpose:** Show what large language models ALREADY know about the target — AND what they don't. The gap between the two is where the prospect is losing today's category conversations.
 
 **Required elements:**
 - Eyebrow: "How AI Identifies You"
-- H1: "What AI engines already know about {{COMPANY_NAME}}"
+- H1: frame what AI sees as partial/incomplete. Example: "AI engines can only partially identify {{COMPANY_NAME}} — <strong>and the gaps competitors are filling</strong>"
 - Positioning one-liner pulled verbatim from the homepage hero (label it "Positioning AI repeats")
 - 2-stat row: Named Proof AI Can Cite (count of public logos/case-studies/press), Disambiguation Risk (count of same-named entities)
-- Right rail: 4 findings (Product, Customer, Proof, Recent Motion)
+- Right rail: 4 findings (Product, Customer, Proof, Recent Motion). At least one finding should name an identity gap — something AI should see about this brand but can't.
 
 **What NOT to include:**
 - Founding year, HQ city, employee count, funding history — none of that shapes AI retrieval. Keep the page focused on identity signals AI actually uses.
+- DO NOT frame this page as "here's your company bio." Frame it as "here's what AI sees and where the holes are."
 
 **Voice:**
 - Only cite facts verifiable on the public site.
 - Drop anything unverifiable — don't flag it in this section.
+- Lead with gap, not accomplishment. Example finding: "Named Customer Proof — AI Engines Cite 3 of Your 10 Retail Partners" rather than "10 Major Retail Partners Verified."
 
 ---
 
@@ -201,30 +207,33 @@ This report is client-facing — an AE hands it to the prospect. Every page outs
 
 ## [12] The Path Forward
 
-**Purpose:** Phased roadmap. What's done vs what's next vs what's ongoing.
+**Purpose:** Phased roadmap. What's done vs what's next vs what's ongoing. The emphasis is that today's score is the FLOOR, not the ceiling — and that without the "Next Sprint" column the score goes backwards as competitors catch up.
 
 **Required elements:**
 - Eyebrow: "The Path Forward"
-- H1 with projected metric change ("63.7% → 72%+. Now make it durable.")
+- H1 framed as durability, not victory. Good: "Turn {vis}% visibility into a <strong>durable lead</strong>." Bad: "63.7% → 72%+. Now make it durable." (implies "we already made it, just lock in").
 - 3 path rows: Current Snapshot (Now), Next Sprint (30 Days), Monitoring (60-90 Days). Each row shows 4-5 chip pills.
 - "Done" chips use a green dot + muted ink text. Future chips use an orange dot + normal ink text.
 
 **Voice:**
 - Phase names are platform-consistent. Don't invent new phase labels.
+- The "Now" column lists what's ALREADY in place (crawlable site, brand recognition, etc.) and calls it a **foundation** — never a **lead** or **advantage**. The second column is what converts foundation into lead.
 
 ---
 
 ## [13] Next Steps
 
-**Purpose:** Concrete suggested timeline that an AE can put in a proposal or SOW.
+**Purpose:** Concrete suggested timeline that an AE can put in a proposal or SOW. The page also names the cost of NOT acting — competitors close gaps fast in AEO.
 
 **Required elements:**
 - Eyebrow: "Next Steps"
-- H1 emphasis: "…turns that into movement"
+- H1 frames the work as securing fragile ground. Example: "Your visibility lead is <strong>fragile</strong> — the next 90 days decide whether it becomes a market position or evaporates."
 - Right rail: "Suggested Timeline" with 4 timeline rows. Each: name, when (colored orange for this-quarter, green for next-quarter), and a filled progress track.
 
 **Voice:**
 - The timeline implicitly commits Visibl. Be conservative with dates.
+- Never say "lock in the lead". Say "turn it into durable position", "protect it before competitors copy it", "convert visibility into defensibility." The lead is not owned yet; the client still has to earn it.
+- Timeline entries start at "Next 30 Days" — do not include "This Week" or "Week of April X" rows; those are too soon for typical AE-to-prospect engagement timing.
 
 ---
 
@@ -235,7 +244,7 @@ This report is client-facing — an AE hands it to the prospect. Every page outs
 **Required elements:**
 - Eyebrow: "Progress Snapshot"
 - Hero-size title: "Let's keep building." with "building." in orange
-- Subtitle: one-paragraph forward-looking framing
+- Subtitle: one-paragraph forward-looking framing. Subtitle must call back to the Tension Rule — reference the fragility of the current position and the window to act — not "you're already winning, we'll help you lock it in."
 - Right rail: 1 big-number row (Current Health Score only) + "Get In Touch" block with hello@bordlabs.ai and the prepared-for byline
 
 **What NOT to include:**
@@ -247,3 +256,4 @@ This report is client-facing — an AE hands it to the prospect. Every page outs
 **Voice:**
 - Forward-looking, collaborative. Not a hard sell.
 - Short. The page is mostly whitespace by design — a quiet closing beat after 13 data-dense pages.
+- Sample subtitle when tension applies: "You have the foundation to lead category AI conversations — but that foundation is exposed. The next 60-90 days decide whether visibility becomes defensibility. Here's how we get there together." (Not: "You already lead the category. The next move locks that in.")

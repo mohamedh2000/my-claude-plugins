@@ -91,6 +91,8 @@
       html, body {
         width: 1500px;
         background: var(--paper);
+        margin: 0;
+        padding: 0;
       }
       body {
         -webkit-print-color-adjust: exact;
@@ -112,6 +114,74 @@
       .page:last-child {
         page-break-after: auto;
         break-after: auto;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       Mobile / tablet — the report was designed as a 1500px landscape deck,
+       but AEs share the HTML URL in emails and prospects often open it on
+       phone. Below 900px we collapse the two-column splits, drop the fixed
+       1500px width, and let pages scroll vertically as a single column. The
+       @media print rules above are untouched so PDF generation behavior is
+       unchanged.
+       ═══════════════════════════════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      html, body {
+        width: 100%;
+        overflow-x: hidden;
+      }
+      .page {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        min-height: auto;
+        padding: 28px 20px 36px;
+        margin: 0 0 16px;
+        background-size: 12px 12px;
+        overflow: visible;
+      }
+      .page + .page { margin-top: 0; }
+
+      .split-5-5,
+      .split-6-4,
+      .split-7-3 {
+        display: block;
+      }
+      .split-5-5 > * + *,
+      .split-6-4 > * + *,
+      .split-7-3 > * + * { margin-top: 28px; }
+
+      .stat-grid-2,
+      .comp-grid,
+      .rec-grid-4,
+      .stat-row-3,
+      .stat-row-4 {
+        grid-template-columns: 1fr !important;
+        gap: 16px;
+      }
+      .stat-row-2 { gap: 20px; }
+
+      .hero { font-size: 44px; line-height: 1.1; }
+      .h1   { font-size: 30px; line-height: 1.2; }
+      .h2   { font-size: 22px; }
+      .big-stat,
+      .stat-cell-value { font-size: 44px; }
+
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .page-footer {
+        position: static;
+        left: auto;
+        right: auto;
+        bottom: auto;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 28px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border-sub);
       }
     }
 

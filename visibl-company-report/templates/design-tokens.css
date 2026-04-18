@@ -60,6 +60,8 @@
   html, body {
     width: 1500px;
     background: var(--paper);
+    margin: 0;
+    padding: 0;
   }
   body {
     -webkit-print-color-adjust: exact;

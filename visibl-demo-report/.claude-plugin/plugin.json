@@ -1,0 +1,7 @@
+{
+  "name": "visibl-demo-report",
+  "version": "1.0.0",
+  "description": "Generate a deep Visibl AI Visibility demo report for live client presentations \u2014 expanded detail with 15-rec 4-phase roadmap, per-query table, per-competitor stat blocks. Same Good-Culture visual design as the AE skill, 14 pages, denser per page.",
+  "author": { "name": "mohamedh" },
+  "license": "MIT"
+}

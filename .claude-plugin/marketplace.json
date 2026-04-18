@@ -42,9 +42,39 @@
       "source": "./test-creator-agent"
     },
     {
+      "name": "deep-prd",
+      "description": "Deep implementation research with parallel specialist agents and multi-reviewer iteration",
+      "source": "./deep-prd"
+    },
+    {
+      "name": "diagram-first",
+      "description": "Enforces diagram-first architecture: must create and get approval on flow/state diagrams before any implementation",
+      "source": "./diagram-first"
+    },
+    {
+      "name": "snapshot",
+      "description": "Save conversation context to a snapshot file before compacting, ensuring important context is preserved",
+      "source": "./snapshot"
+    },
+    {
+      "name": "fresh",
+      "description": "Fresh start workflow — save resume context and /clear for a clean context window",
+      "source": "./fresh"
+    },
+    {
+      "name": "datamap",
+      "description": "Generate entity-level Data Maps — multi-agent research pipeline that traces Prisma models, business logic, API routes, hooks, and compound business intelligence",
+      "source": "./datamap"
+    },
+    {
       "name": "visibl-company-report",
       "description": "Generate a Visibl-branded AEO/SEO diagnostic report for any target company — HTML + PDF",
       "source": "./visibl-company-report"
+    },
+    {
+      "name": "visibl-demo-report",
+      "description": "Generate a DEEP Visibl AI Visibility demo report for live client presentations — continuous-flow document with 15-rec 4-phase roadmap, per-query detail, and 24-block competitive grid",
+      "source": "./visibl-demo-report"
     }
   ]
 }

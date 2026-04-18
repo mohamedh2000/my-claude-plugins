@@ -1,0 +1,129 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   VISIBL · AI VISIBILITY PROGRESS REPORT · Design Tokens (v2)
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Platform-canonical design system used by the AI Visibility Progress Report
+   (see the "Good Culture" reference in Visibl's product). These tokens are
+   embedded directly in templates/report.html as a <style> block — this file
+   is the REFERENCE when the skill (or a human) needs to look up a value or
+   evolve the palette.
+
+   LAW: never introduce colors not declared here. No neon dashboard, no
+   gradient mesh, no Inter + violet combos. The aesthetic is "dotted cream
+   paper + ink + orange accent" — calm, editorial, analytical.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ───── Paper surface (dotted background) ───── */
+  --paper:       #F4F3EF;   /* main background — cool paper, less yellow cast in PDF */
+  --paper-edge:  #ECEAE5;   /* slightly darker for chip backgrounds */
+  --dot:         #DDDBD5;   /* the dotted grid overlay (1px dots on 14px grid) */
+
+  /* ───── Ink scale ───── */
+  --ink:         #1A1A1A;   /* primary text, hero titles, big numbers */
+  --ink-2:       #444444;   /* secondary text */
+  --ink-3:       #666666;   /* body prose, subtle labels */
+  --ink-4:       #888888;   /* muted captions, footnotes */
+  --ink-5:       #B0B0A8;   /* faintest ink on paper */
+
+  /* ───── Borders ───── */
+  --border:      #E5E2DB;   /* card borders */
+  --border-sub:  #EFEDE8;   /* subtler internal dividers */
+
+  /* ───── Orange accent ───── */
+  --accent:      #E8500C;   /* Visibl brand orange — eyebrows, emphasis words */
+  --accent-soft: #FDECE3;   /* soft background for chips / callouts */
+
+  /* ───── Status semantics (used on bar fills + big numbers only) ───── */
+  --green:       #2DA44E;
+  --green-soft:  #E2F3E4;
+  --red:         #D93025;
+  --red-soft:    #FAE5E2;
+  --amber:       #E8A317;   /* warning/mixed metric (e.g. 63.7%) */
+  --amber-soft:  #FBF0D6;
+
+  /* ───── Type ───── */
+  --font-sans:   'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:   'JetBrains Mono', 'Courier New', monospace;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Print setup — landscape widescreen, zero margin, color-faithful
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@page {
+  size: 1500px 940px;   /* must match .page dims exactly — in-based @page rounds to 1440x902 @ 96dpi and produces blank pages */
+  margin: 0;
+}
+
+@media print {
+  html, body {
+    width: 1500px;
+    background: var(--paper);
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page {
+    page-break-after: always;
+    page-break-inside: avoid;
+    break-after: page;
+    break-inside: avoid;
+    margin: 0;
+  }
+  .page:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Core page shell
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Every section is a .page with a fixed 1500×940 box and a radial-gradient
+   dotted background. This is what makes the aesthetic unmistakable — the dots
+   live on every page and scale cleanly when Chrome headless prints to PDF.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.65;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.page {
+  position: relative;
+  width: 1500px;
+  height: 940px;
+  margin: 0 auto;
+  background-color: var(--paper);
+  background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+  background-size: 14px 14px;
+  background-position: 0 0;
+  padding: 44px 60px 48px;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Typography primitives
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* .eyebrow   — orange mono uppercase label above each page's headline */
+/* .hero      — cover title (72px weight 300, one word in --accent) */
+/* .h1        — page title (44px weight 300 with optional <strong> for emphasis) */
+/* .h2        — secondary heading (28px) */
+/* .subtitle  — body lead paragraph (14px, ink-3) */
+/* .label     — mono 10px uppercase label above stat rows */

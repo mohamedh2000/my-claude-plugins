@@ -125,7 +125,11 @@
        @media print rules above are untouched so PDF generation behavior is
        unchanged.
        ═══════════════════════════════════════════════════════════════════════ */
-    @media (max-width: 900px) {
+    /* IMPORTANT: scoped to `screen` so PDF generation (which Chrome headless
+       runs with an 800px default viewport) doesn't accidentally trigger the
+       mobile collapse rules and flatten multi-column grids into a single
+       column in the printed output. */
+    @media screen and (max-width: 900px) {
       html, body {
         width: 100%;
         overflow-x: hidden;
